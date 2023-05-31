@@ -1,0 +1,4 @@
+﻿resource/*
+!resource/.gitkeep
+build/*
+!build/.bitkeep

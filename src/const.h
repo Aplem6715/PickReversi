@@ -3,8 +3,6 @@
 
 #define GLOBAL_SEED 42
 
-#include <string>
-
 // 最大の着手可能位置数(46以下であることは証明されているらしい)
 // 実際に見つかった盤面は（手順無視で）34が最大？手順通りだと30?
 constexpr int MAX_MOVES = 40;
@@ -37,7 +35,7 @@ enum Position
 // clang-format on
 
 // clang-format off
-constexpr auto POS_NAMES = {
+constexpr char const* POS_NAMES[] = {
 	"A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1",
 	"A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2",
 	"A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3",

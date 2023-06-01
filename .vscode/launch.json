@@ -76,7 +76,7 @@
         //     "preLaunchTask": "Build Bench Release"
         // },
         {
-            "name": "デバッグ(debug)",
+            "name": "デバッグ",
             "type": "cppdbg",
             "request": "launch",
             "program": "${command:cmake.launchTargetDirectory}/Reversi2023.exe",
@@ -97,10 +97,10 @@
             "preLaunchTask": "Build Reversi2023"
         },
         {
-            "name": "テスト実行(debug)",
+            "name": "テスト実行",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test/UnitTest.exe",
+            "program": "${command:cmake.launchTargetDirectory}/UnitTest.exe",
             "args": [
                 "--gtest_color=yes"
             ],

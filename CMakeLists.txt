@@ -5,6 +5,16 @@ cmake_minimum_required(VERSION 3.12)
 
 project ("Reversi2023")
 
+include(FetchContent)
+
+# GoogleTestのダウンロードとビルド
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        release-1.11.0
+)
+FetchContent_MakeAvailable(googletest)
+
 # Debugビルドの場合の出力先を指定する
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/lib)

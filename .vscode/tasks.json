@@ -5,6 +5,11 @@
 			"label": "Build Reversi2023",
 			"type": "shell",
 			"command": "cmake --build ${workspaceFolder}/build --target Reversi2023 -j 10 --"
+		},
+		{
+			"label": "Build Test",
+			"type": "shell",
+			"command": "cmake --build ${workspaceFolder}/build --target UnitTest -j 10 --"
 		}
 	]
 }

@@ -20,8 +20,8 @@ constexpr int OPP = 1;
 
 enum class Color : uint8_t
 {
-	Black,
-	White,
+    Black,
+    White,
 };
 
 // clang-format off

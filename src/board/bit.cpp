@@ -63,7 +63,7 @@ uint64_t CalcPosBit(const Position posIdx)
  * @param x X座標出力
  * @param y y座標出力
  */
-void CalcPosAscii(const Position posIdx, char *const x, int *const y)
+void CalcPosAscii(const Position posIdx, char* const x, int* const y)
 {
     *x = 'H' - static_cast<int>(posIdx) % 8;
     *y = 8 - (static_cast<int>(posIdx) / 8);

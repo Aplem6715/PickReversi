@@ -1,7 +1,7 @@
 ﻿#include <iostream>
 
-#include "board.h"
 #include "bit.h"
+#include "board.h"
 
 constexpr uint64_t INIT_BLACK = 0x0000000810000000;
 constexpr uint64_t INIT_WHITE = 0x0000001008000000;
@@ -15,9 +15,9 @@ Board::~Board()
 
 void Board::Reset()
 {
-    _black = INIT_BLACK;
-    _white = INIT_WHITE;
-    _side = Color::Black;
+    _black    = INIT_BLACK;
+    _white    = INIT_WHITE;
+    _side     = Color::Black;
     _nbPlayed = 0;
 }
 
@@ -82,19 +82,19 @@ uint64_t Board::Put(Position pos)
     uint64_t flip;
     if (_side == Color::Black)
     {
-        flip = CalcFlip64(_black, _white, pos);
+        flip   = CalcFlip64(_black, _white, pos);
         _black = _black ^ flip ^ CalcPosBit(pos);
         _white = _white ^ flip;
     }
     else
     {
-        flip = CalcFlip64(_white, _black, pos);
+        flip   = CalcFlip64(_white, _black, pos);
         _black = _black ^ flip;
         _white = _white ^ flip ^ CalcPosBit(pos);
     }
     // 着手情報を保存（どっちが，どこに打ち，どこを反転させたか）
     _history[_nbPlayed].side = _side;
-    _history[_nbPlayed].pos = pos;
+    _history[_nbPlayed].pos  = pos;
     _history[_nbPlayed].flip = flip;
     _nbPlayed++;
     ChangeSide();
@@ -108,7 +108,7 @@ bool Board::Undo()
         _nbPlayed--;
 
         Color hist_turn = _history[_nbPlayed].side;
-        uint64_t flip = _history[_nbPlayed].flip;
+        uint64_t flip   = _history[_nbPlayed].flip;
         uint64_t posBit = CalcPosBit(_history[_nbPlayed].pos);
 
         if (hist_turn == Color::Black)

@@ -1,8 +1,8 @@
 ﻿#ifndef BOARD_H
 #define BOARD_H
 
-#include <stdint.h>
 #include "../const.h"
+#include <stdint.h>
 
 // 最大履歴数（64マスで初期4マス埋まっているので60手分必要）
 constexpr unsigned char HIST_LENGTH = 60;

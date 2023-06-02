@@ -10,7 +10,7 @@ TEST(Board, Put)
     board->Put(Position::C4);
     // board->Print();
 
-    uint64_t flip = 1 << static_cast<int>(Position::D4);
+    uint64_t flip         = 1 << static_cast<int>(Position::D4);
     uint64_t flippedBlack = INIT_BLACK ^ flip | 1 << static_cast<int>(Position::C4);
     uint64_t flippedWhite = INIT_WHITE ^ flip;
     ASSERT_EQ(board->GetStone(Color::Black), flippedBlack);
@@ -47,7 +47,8 @@ TEST(Board, Undo)
     ASSERT_EQ(board->GetStone(Color::White), INIT_WHITE);
 }
 
-TEST(Board, SkipBlock) {
+TEST(Board, SkipBlock)
+{
     auto board = new Board();
     board->Put(Position::C4);
 
@@ -55,7 +56,8 @@ TEST(Board, SkipBlock) {
     ASSERT_FALSE(board->Skip());
 }
 
-TEST(Board, StoneCount) {
+TEST(Board, StoneCount)
+{
     auto board = new Board();
     board->Put(Position::C4);
     board->Put(Position::C3);

@@ -13,11 +13,11 @@ Position PosIndexFromAscii(std::string ascii)
     int x, y;
 
     if (ascii[0] == 'U' || ascii[0] == 'u')
-        return UNDO_POS;
+        return Position::Undo;
 
     if (ascii.length() < 2)
     {
-        return INVALID_POS;
+        return Position::Invalid;
     }
 
     if (ascii[0] >= 'A' && ascii[0] <= 'H')
@@ -30,7 +30,7 @@ Position PosIndexFromAscii(std::string ascii)
     }
     else
     {
-        return NOMOVE_POS;
+        return Position::NoMove;
     }
 
     if (ascii[1] >= '1' && ascii[1] <= '8')
@@ -39,7 +39,7 @@ Position PosIndexFromAscii(std::string ascii)
     }
     else
     {
-        return NOMOVE_POS;
+        return Position::NoMove;
     }
 
     return static_cast<Position>(63 - (x + y * 8));
@@ -51,9 +51,9 @@ Position PosIndexFromAscii(std::string ascii)
  * @param posIdx 位置インデックス
  * @return uint64_t bit位置
  */
-uint64_t CalcPosBit(const unsigned char posIdx)
+uint64_t CalcPosBit(const Position posIdx)
 {
-    return (uint64_t)0x0000000000000001 << posIdx;
+    return (uint64_t)0x0000000000000001 << static_cast<int>(posIdx);
 }
 
 /**
@@ -63,8 +63,8 @@ uint64_t CalcPosBit(const unsigned char posIdx)
  * @param x X座標出力
  * @param y y座標出力
  */
-void CalcPosAscii(const unsigned char posIdx, char *const x, int *const y)
+void CalcPosAscii(const Position posIdx, char *const x, int *const y)
 {
-    *x = 'H' - posIdx % 8;
-    *y = 8 - (posIdx / 8);
+    *x = 'H' - static_cast<int>(posIdx) % 8;
+    *y = 8 - (static_cast<int>(posIdx) / 8);
 }

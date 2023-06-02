@@ -3,24 +3,30 @@
 
 #define GLOBAL_SEED 42
 
+#include <stdint.h>
+
 // 最大の着手可能位置数(46以下であることは証明されているらしい)
 // 実際に見つかった盤面は（手順無視で）34が最大？手順通りだと30?
 constexpr int MAX_MOVES = 40;
 
-constexpr char BLACK_CUI_ICON[] = "##";
-constexpr char WHITE_CUI_ICON[] = "--";
+// 盤面サイズ
+constexpr unsigned char BOARD_SIZE = 8;
+
+constexpr char BLACK_CUI_ICON[] = "O";
+constexpr char WHITE_CUI_ICON[] = "X";
 
 constexpr int OWN = 0;
 constexpr int OPP = 1;
 
-enum Color
+enum class Color : uint8_t
 {
-	BLACK,
-	WHITE,
+	Black,
+	White,
 };
 
 // clang-format off
-enum Position
+// 着手位置
+enum class Position: uint8_t
 {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -30,7 +36,7 @@ enum Position
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8,
-    NOMOVE_POS, PASS_POS, UNDO_POS, INVALID_POS, POS_MAX
+    NoMove, Pass, Undo, Invalid, Max
 };
 // clang-format on
 

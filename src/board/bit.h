@@ -10,8 +10,8 @@
 #endif
 
 Position PosIndexFromAscii(std::string ascii);
-uint64_t CalcPosBit(uint8_t posIdx);
-void CalcPosAscii(uint8_t posIdx, char *const x, int *const y);
+uint64_t CalcPosBit(Position posIdx);
+void CalcPosAscii(Position posIdx, char *const x, int *const y);
 
 /**
  * @brief ビット演算関連の処理
@@ -187,11 +187,13 @@ inline uint64_t CalcMobility64(const uint64_t own, const uint64_t opp)
  *
  * @param own 自身の石情報
  * @param opp 相手の石情報
- * @param pos 着手位置番号
+ * @param pos 着手位置
  * @return uint64_t 反転位置bit
  */
-inline uint64_t CalcFlip64(const uint64_t own, const uint64_t opp, const uint8_t pos)
+inline uint64_t CalcFlip64(const uint64_t own, const uint64_t opp, const Position pos)
 {
+	uint64_t index = static_cast<uint64_t>(pos);
+
 	uint64_t flipped[4];
 	uint64_t oppM[4];
 	uint64_t outflank[4];
@@ -202,10 +204,10 @@ inline uint64_t CalcFlip64(const uint64_t own, const uint64_t opp, const uint8_t
 	oppM[2] = opp & 0x7e7e7e7e7e7e7e7eULL;
 	oppM[3] = opp & 0x7e7e7e7e7e7e7e7eULL;
 
-	mask[0] = 0x0080808080808080ULL >> (63 - pos);
-	mask[1] = 0x7f00000000000000ULL >> (63 - pos);
-	mask[2] = 0x0102040810204000ULL >> (63 - pos);
-	mask[3] = 0x0040201008040201ULL >> (63 - pos);
+	mask[0] = 0x0080808080808080ULL >> (63 - index);
+	mask[1] = 0x7f00000000000000ULL >> (63 - index);
+	mask[2] = 0x0102040810204000ULL >> (63 - index);
+	mask[3] = 0x0040201008040201ULL >> (63 - index);
 
 	outflank[0] = (0x8000000000000000UL >> lzcnt(~oppM[0] & mask[0])) & own;
 	outflank[1] = (0x8000000000000000UL >> lzcnt(~oppM[1] & mask[1])) & own;
@@ -220,10 +222,10 @@ inline uint64_t CalcFlip64(const uint64_t own, const uint64_t opp, const uint8_t
 	flipped[3] = (-outflank[3] * 2) & mask[3];
 #pragma warning(pop)
 
-	mask[0] = 0x0101010101010100ULL << pos;
-	mask[1] = 0x00000000000000feULL << pos;
-	mask[2] = 0x0002040810204080ULL << pos;
-	mask[3] = 0x8040201008040200ULL << pos;
+	mask[0] = 0x0101010101010100ULL << index;
+	mask[1] = 0x00000000000000feULL << index;
+	mask[2] = 0x0002040810204080ULL << index;
+	mask[3] = 0x8040201008040200ULL << index;
 
 	outflank[0] = mask[0] & ((oppM[0] | ~mask[0]) + 1) & own;
 	outflank[1] = mask[1] & ((oppM[1] | ~mask[1]) + 1) & own;
@@ -242,9 +244,9 @@ inline uint64_t CalcFlip64(const uint64_t own, const uint64_t opp, const uint8_t
  * @brief 立っているビット数を数える
  *
  * @param stone 石情報
- * @return uint8_t 立っているビット数
+ * @return uint64_t 立っているビット数
  */
-inline uint8_t CountBits(const uint64_t stone) { return popcnt(stone); }
+inline uint64_t CountBits(const uint64_t stone) { return popcnt(stone); }
 
 #pragma warning(push)
 #pragma warning(disable : 4146)
@@ -252,15 +254,25 @@ inline uint8_t CountBits(const uint64_t stone) { return popcnt(stone); }
  * @brief 64bit位置情報から位置インデックス（位置番号）を計算
  *
  * @param pos64 64bit位置情報
- * @return uint8_t 位置インデックス（位置番号）
+ * @return Position 位置
  */
 inline Position PosIndexFromBit(const uint64_t pos64)
 {
 	return static_cast<Position>(tzcnt(pos64));
 }
-inline unsigned char AntiColor(unsigned char color) { return color ^ 1; }
-inline uint64_t GetLSB(uint64_t bits) { return (-bits & bits); }
-inline uint8_t NextIndex(uint64_t *bits)
+
+inline Color AntiColor(Color color)
+{
+	auto iColor = static_cast<int>(color);
+	return static_cast<Color>(iColor ^ 1);
+}
+
+inline uint64_t GetLSB(uint64_t bits)
+{
+	return (-bits & bits);
+}
+
+inline Position NextIndex(uint64_t *bits)
 {
 	*bits &= *bits - 1;
 	return PosIndexFromBit(*bits);

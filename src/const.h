@@ -3,7 +3,7 @@
 
 #define GLOBAL_SEED 42
 
-#include <stdint.h>
+#include "type.h"
 
 // 最大の着手可能位置数(46以下であることは証明されているらしい)
 // 実際に見つかった盤面は（手順無視で）34が最大？手順通りだと30?

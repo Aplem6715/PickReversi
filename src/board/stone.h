@@ -18,4 +18,26 @@ public:
     uint64_t CalcMobility() { return CalcMobility64(own, opp); }
 };
 
+inline void Stone::Swap()
+{
+    // 勝手に最適化されるだろう
+    auto temp = own;
+    own       = opp;
+    opp       = temp;
+}
+
+inline void Stone::Update(uint64_t pos, uint64_t flips)
+{
+    own = own ^ (flips | pos);
+    opp = opp ^ flips;
+    Swap();
+}
+
+inline void Stone::Restore(uint64_t pos, uint64_t flips)
+{
+    Swap();
+    own = own ^ flips;
+    opp = opp ^ (flips | pos);
+}
+
 #endif

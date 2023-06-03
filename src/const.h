@@ -12,8 +12,8 @@ constexpr int MAX_MOVES = 40;
 // 盤面サイズ
 constexpr unsigned char BOARD_SIZE = 8;
 
-constexpr char BLACK_CUI_ICON[] = "O";
-constexpr char WHITE_CUI_ICON[] = "X";
+constexpr char BLACK_CUI_ICON[] = "X";
+constexpr char WHITE_CUI_ICON[] = "O";
 
 constexpr int OWN = 0;
 constexpr int OPP = 1;

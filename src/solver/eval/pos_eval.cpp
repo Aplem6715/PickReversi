@@ -45,8 +45,8 @@ void PositionEvaluator::Update(stone_t pos, stone_t flips)
 void PositionEvaluator::Restore(stone_t pos, stone_t flips)
 {
     Swap();
-    _own = _own ^ flips;
-    _opp = _opp ^ (flips | pos);
+    _own = _own ^ (flips | pos);
+    _opp = _opp ^ flips;
 }
 
 void PositionEvaluator::UpdatePass()

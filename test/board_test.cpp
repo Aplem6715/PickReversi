@@ -67,19 +67,24 @@ TEST(Board, StoneCount)
     board->Put(Position::F5);
     board->Put(Position::D6);
     board->Put(Position::E6);
+    board->Put(Position::C2);
+    board->Put(Position::B1);
+    board->Put(Position::C1);
+    board->Put(Position::B2);
+    board->Put(Position::A1);
     // board->Print();
 
     //   A B C D E F G H
-    // 1 - - - - - - - - 1
-    // 2 - . . . . . - - 2
-    // 3 - - X X X . - - 3
-    // 4 - - O O X O - - 4
-    // 5 - - - O X X . - 5
-    // 6 - - - O X . - - 6
-    // 7 - - - - - . - - 7
+    // 1 X X X - - - - - 1
+    // 2 - O X . - - - - 2
+    // 3 - . O O O . . - 3
+    // 4 - . X O O X . - 4
+    // 5 - . . X O O . - 5
+    // 6 - - . X O - - - 6
+    // 7 - - . . - - - - 7
     // 8 - - - - - - - - 8
     //   A B C D E F G H
 
-    ASSERT_EQ(board->StoneCount(Color::Black), 5);
-    ASSERT_EQ(board->StoneCount(Color::White), 7);
+    ASSERT_EQ(board->StoneCount(Color::Black), 8);
+    ASSERT_EQ(board->StoneCount(Color::White), 9);
 }

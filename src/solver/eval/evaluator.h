@@ -6,8 +6,8 @@
 class Evaluator
 {
 public:
-    Evaluator();
-    ~Evaluator();
+    Evaluator(){};
+    ~Evaluator(){};
 
     virtual score_t Evaluate(int nEmpty) = 0;
 

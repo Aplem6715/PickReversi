@@ -25,7 +25,10 @@ private:
 private:
     stone_t _own;
     stone_t _opp;
-};
 
+#ifdef UNIT_TEST
+    friend class PositionEvaluator_Test;
+#endif
+};
 
 #endif

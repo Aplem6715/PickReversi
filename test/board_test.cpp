@@ -4,6 +4,8 @@
 constexpr uint64_t INIT_BLACK = 0x0000000810000000;
 constexpr uint64_t INIT_WHITE = 0x0000001008000000;
 
+using namespace board;
+
 TEST(Board, Put)
 {
     auto board = new Board();

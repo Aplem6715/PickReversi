@@ -13,13 +13,16 @@ namespace board
 {
 
     Position PosIndexFromAscii(std::string ascii);
-    uint64_t CalcPosBit(Position posIdx);
     void CalcPosAscii(Position posIdx, char* const x, int* const y);
 
     /**
      * @brief ビット演算関連の処理
      * 処理性能重視・インライン化のためにヘッダー実装
      */
+
+    /// @brief 位置インデックスをビット変換
+    /// @param posIdx 位置
+    inline uint64_t PosToBit(Position posIdx) { return (uint64_t)0x0000000000000001 << static_cast<int>(posIdx); }
 
     /**
      * @brief 立っているビット数を数える

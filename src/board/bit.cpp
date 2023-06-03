@@ -49,17 +49,6 @@ namespace board
     }
 
     /**
-     * @brief 位置インデックスから64bit位置情報を計算
-     *
-     * @param posIdx 位置インデックス
-     * @return uint64_t bit位置
-     */
-    uint64_t CalcPosBit(const Position posIdx)
-    {
-        return (uint64_t)0x0000000000000001 << static_cast<int>(posIdx);
-    }
-
-    /**
      * @brief 位置インデックスに対応するAscii位置情報を計算
      *
      * @param posIdx 位置インデックス

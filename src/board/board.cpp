@@ -85,14 +85,14 @@ namespace board
         if (_side == Color::Black)
         {
             flip   = CalcFlip64(_black, _white, pos);
-            _black = _black ^ flip ^ CalcPosBit(pos);
+            _black = _black ^ flip ^ PosToBit(pos);
             _white = _white ^ flip;
         }
         else
         {
             flip   = CalcFlip64(_white, _black, pos);
             _black = _black ^ flip;
-            _white = _white ^ flip ^ CalcPosBit(pos);
+            _white = _white ^ flip ^ PosToBit(pos);
         }
         // 着手情報を保存（どっちが，どこに打ち，どこを反転させたか）
         _history[_nbPlayed].side = _side;
@@ -111,7 +111,7 @@ namespace board
 
             Color hist_turn = _history[_nbPlayed].side;
             uint64_t flip   = _history[_nbPlayed].flip;
-            uint64_t posBit = CalcPosBit(_history[_nbPlayed].pos);
+            uint64_t posBit = PosToBit(_history[_nbPlayed].pos);
 
             if (hist_turn == Color::Black)
             {
@@ -177,7 +177,7 @@ namespace board
             return false;
         }
         uint64_t mob = CalcMobility64(GetOwn(), GetOpp());
-        uint64_t put = CalcPosBit(pos);
+        uint64_t put = PosToBit(pos);
         return (mob & put) != 0;
     }
 

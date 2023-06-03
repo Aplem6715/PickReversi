@@ -3,7 +3,7 @@
 
 #define GLOBAL_SEED 42
 
-#include <stdint.h>
+#include "type.h"
 
 // 最大の着手可能位置数(46以下であることは証明されているらしい)
 // 実際に見つかった盤面は（手順無視で）34が最大？手順通りだと30?
@@ -12,8 +12,8 @@ constexpr int MAX_MOVES = 40;
 // 盤面サイズ
 constexpr unsigned char BOARD_SIZE = 8;
 
-constexpr char BLACK_CUI_ICON[] = "O";
-constexpr char WHITE_CUI_ICON[] = "X";
+constexpr char BLACK_CUI_ICON[] = "X";
+constexpr char WHITE_CUI_ICON[] = "O";
 
 constexpr int OWN = 0;
 constexpr int OPP = 1;

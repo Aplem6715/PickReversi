@@ -16,6 +16,7 @@ namespace board
         void Swap();
         void Update(uint64_t pos, uint64_t flips);
         void Restore(uint64_t pos, uint64_t flips);
+        int GetCountDiff();
 
         uint64_t CalcFlip(const Position index) { return CalcFlip64(own_, opp_, index); }
         uint64_t CalcMobility() { return CalcMobility64(own_, opp_); }
@@ -41,6 +42,11 @@ namespace board
         Swap();
         own_ = own_ ^ flips;
         opp_ = opp_ ^ (flips | pos);
+    }
+
+    inline int Stone::GetCountDiff()
+    {
+        return CountBits(own_) - CountBits(opp_);
     }
 }
 #endif

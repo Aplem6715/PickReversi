@@ -6,6 +6,7 @@
 #include "board/stone.h"
 #include "eval/pos_eval.h"
 #include "search_option.h"
+#include "movelist.h"
 
 namespace solver
 {
@@ -13,8 +14,6 @@ namespace solver
     using namespace eval;
 
     struct SearchResult;
-    struct MoveList;
-    struct Move;
 
     /// 1石あたりの評価値
     constexpr int EvalStone   = 10;
@@ -34,12 +33,7 @@ namespace solver
 
         /// @brief 最善手を検索
         /// @return 最善手
-        Position Search();
-
-        /// @brief 着手位置を検索
-        /// @param ratio 選択確率の配列（idx0から1st率，2nd率...）
-        /// @return 選択された着手位置
-        Position Search(std::vector<float> ratio);
+        void Search(SearchResult* result);
 
     private:
         // 盤面
@@ -62,10 +56,6 @@ namespace solver
         /// @brief 中盤探索ルート
         void MidRoot(SearchResult* result);
 
-        void UpdateMid(const Move* move);
-
-        void RestoreMid(const Move* move);
-
         void PassMid();
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
@@ -78,19 +68,44 @@ namespace solver
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
-        void UpdateEnd(Move const* move);
-
-        void RestoreEnd(Move const* move);
-
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
         score_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
         score_t EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
 
+        /* 探索中に使用するinline関数 */
+
+        void Update(const Move* move, bool updateEval)
+        {
+            --nbEmpty_;
+            const uint64_t posBit = PosToBit(move->pos_);
+            stones_->Update(posBit, move->flips_);
+            if (updateEval)
+            {
+                eval_->Update(posBit, move->flips_);
+            }
+        }
+
+        void Restore(const Move* move, bool updateEval)
+        {
+            ++nbEmpty_;
+            const uint64_t posBit = PosToBit(move->pos_);
+            stones_->Restore(posBit, move->flips_);
+            if (updateEval)
+            {
+                eval_->Restore(posBit, move->flips_);
+            }
+        }
+
+        void UpdatePass()
+        {
+            stones_->Swap();
+        }
+
         score_t WinJudge()
         {
-            auto diff = CountBits(stones_->own_) - CountBits(stones_->opp_);
+            auto diff = stones_->GetCountDiff();
             if (diff > 0)
             {
                 return EvalMax;
@@ -98,6 +113,24 @@ namespace solver
             else if (diff < 0)
             {
                 return EvalMin;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        score_t WinJudgeEnd()
+        {
+            auto diff = stones_->GetCountDiff();
+            // 空きマスは勝った方に加算される
+            if (diff > 0)
+            {
+                return diff + nbEmpty_;
+            }
+            else if (diff < 0)
+            {
+                return diff - nbEmpty_;
             }
             else
             {

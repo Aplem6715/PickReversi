@@ -33,26 +33,18 @@ namespace solver
         eval_->Reload(own, opp, Side::Own);
     }
 
-    Position Searcher::Search()
+    void Searcher::Search(SearchResult* result)
     {
         Position pos = Position::NoMove;
 
         if (nbEmpty_ <= option_.endDepth_)
         {
-            // pos = EndRoot();
+            EndRoot(result);
         }
         else
         {
-            // pos = MidRoot();
+            MidRoot(result);
         }
-
-        return pos;
-    }
-
-    Position Searcher::Search(std::vector<float> ratio)
-    {
-        // TODO: implement
-        return Position::NoMove;
     }
 
     void Searcher::MakeMoveList(MoveList* moveList)
@@ -94,9 +86,9 @@ namespace solver
 
         while (Move* move = moveList->GetNextBest())
         {
-            UpdateMid(move);
+            Update(move, true);
             score_t score = -MidMinMax(option_.midDepth_, false);
-            RestoreMid(move);
+            Restore(move, true);
 
             if (score > bestScore)
             {
@@ -104,25 +96,6 @@ namespace solver
                 move->value_ = score;
             }
         }
-    }
-
-    void Searcher::UpdateMid(const Move* move)
-    {
-        const uint64_t posBit = PosToBit(move->pos_);
-        stones_->Update(posBit, move->flips_);
-        --nbEmpty_;
-    }
-
-    void Searcher::RestoreMid(const Move* move)
-    {
-        const uint64_t posBit = PosToBit(move->pos_);
-        stones_->Restore(posBit, move->flips_);
-        ++nbEmpty_;
-    }
-
-    void Searcher::PassMid()
-    {
-        stones_->Swap();
     }
 
     score_t Searcher::MidMinMax(int depth, bool passed)
@@ -145,18 +118,18 @@ namespace solver
             }
             else
             {
-                PassMid();
+                UpdatePass();
                 bestScore = -MidMinMax(depth - 1, true);
-                PassMid();
+                UpdatePass();
             }
         }
         else
         {
             while (const Move* move = moveList->GetNextBest())
             {
-                UpdateMid(move);
+                Update(move, true);
                 const score_t score = -MidMinMax(depth - 1, false);
-                RestoreMid(move);
+                Restore(move, true);
 
                 if (score > bestScore)
                 {
@@ -166,5 +139,85 @@ namespace solver
         }
 
         return bestScore;
+    }
+
+    score_t Searcher::MidAlphaBeta(score_t upper, score_t lower, int depth, bool passed)
+    {
+        // TODO: implement
+        return score_t();
+    }
+
+    /* 終盤探索 */
+
+    void Searcher::EndRoot(SearchResult* result)
+    {
+        score_t lower     = EvalMin;
+        score_t upper     = EvalMax;
+        score_t bestScore = EvalInvalid;
+
+        MakeMoveList(result->moveList_);
+        MoveList* moveList = result->moveList_;
+
+        while (Move* move = moveList->GetNextBest())
+        {
+            Update(move, true);
+            score_t score = -MidMinMax(option_.endDepth_, false);
+            Restore(move, true);
+
+            if (score > bestScore)
+            {
+                bestScore    = score;
+                move->value_ = score;
+            }
+        }
+    }
+
+    score_t Searcher::EndMinMax(int depth, bool passed)
+    {
+        if (depth == 0)
+        {
+            return stones_->GetCountDiff();
+        }
+
+        score_t bestScore;
+        MoveList moveList[1];
+
+        MakeMoveList(moveList);
+
+        if (moveList->IsEmpty())
+        {
+            if (passed)
+            {
+                return WinJudgeEnd();
+            }
+            else
+            {
+                UpdatePass();
+                bestScore = -EndMinMax(depth - 1, true);
+                UpdatePass();
+            }
+        }
+        else
+        {
+            while (const Move* move = moveList->GetNextBest())
+            {
+                Update(move, true);
+                const score_t score = -EndMinMax(depth - 1, false);
+                Restore(move, true);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                }
+            }
+        }
+
+        return bestScore;
+    }
+
+    score_t Searcher::EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed)
+    {
+        // TODO: implement
+        return score_t();
     }
 }

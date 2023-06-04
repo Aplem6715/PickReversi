@@ -14,6 +14,13 @@ namespace solver
 
     struct SearchResult;
     struct MoveList;
+    struct Move;
+
+    /// 1石あたりの評価値
+    constexpr int EvalStone   = 10;
+    constexpr int EvalMax     = EvalStone * 64;
+    constexpr int EvalMin     = -EvalMax;
+    constexpr int EvalInvalid = -999;
 
     class Searcher
     {
@@ -51,29 +58,52 @@ namespace solver
         /// @param moveList 手の追加先
         void MakeMoveList(MoveList* moveList);
 
-
         /* 中盤探索(search_mid.cpp) */
-        /// @brief 中盤探索ルート 
+        /// @brief 中盤探索ルート
         void MidRoot(SearchResult* result);
 
+        void UpdateMid(const Move* move);
+
+        void RestoreMid(const Move* move);
+
+        void PassMid();
+
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t MidMinMax(int depth);
+        score_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
-        score_t MidAlphaBeta(score_t upper, score_t lower, int depth);
-        
+        score_t MidAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
+        void UpdateEnd(Move const* move);
+
+        void RestoreEnd(Move const* move);
+
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t EndMinMax(int depth);
+        score_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
-        score_t EndAlphaBeta(score_t upper, score_t lower, int depth);
+        score_t EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
 
-
+        score_t WinJudge()
+        {
+            auto diff = CountBits(stones_->own_) - CountBits(stones_->opp_);
+            if (diff > 0)
+            {
+                return EvalMax;
+            }
+            else if (diff < 0)
+            {
+                return EvalMin;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     };
 }
 #endif

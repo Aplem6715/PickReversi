@@ -1,6 +1,8 @@
 ﻿#include "search.h"
 #include "board/bit.h"
+#include "board/stone.h"
 #include "movelist.h"
+#include "search_result.h"
 
 namespace solver
 {
@@ -77,5 +79,92 @@ namespace solver
         }
         prev->next_       = nullptr;
         moveList->length_ = nbMove;
+    }
+
+    /* 中盤探索 */
+
+    void Searcher::MidRoot(SearchResult* result)
+    {
+        score_t lower     = EvalMin;
+        score_t upper     = EvalMax;
+        score_t bestScore = EvalInvalid;
+
+        MakeMoveList(result->moveList_);
+        MoveList* moveList = result->moveList_;
+
+        while (Move* move = moveList->GetNextBest())
+        {
+            UpdateMid(move);
+            score_t score = -MidMinMax(option_.midDepth_, false);
+            RestoreMid(move);
+
+            if (score > bestScore)
+            {
+                bestScore    = score;
+                move->value_ = score;
+            }
+        }
+    }
+
+    void Searcher::UpdateMid(const Move* move)
+    {
+        const uint64_t posBit = PosToBit(move->pos_);
+        stones_->Update(posBit, move->flips_);
+        --nbEmpty_;
+    }
+
+    void Searcher::RestoreMid(const Move* move)
+    {
+        const uint64_t posBit = PosToBit(move->pos_);
+        stones_->Restore(posBit, move->flips_);
+        ++nbEmpty_;
+    }
+
+    void Searcher::PassMid()
+    {
+        stones_->Swap();
+    }
+
+    score_t Searcher::MidMinMax(int depth, bool passed)
+    {
+        if (depth == 0)
+        {
+            return eval_->Evaluate(nbEmpty_);
+        }
+
+        score_t bestScore;
+        MoveList moveList[1];
+
+        MakeMoveList(moveList);
+
+        if (moveList->IsEmpty())
+        {
+            if (passed)
+            {
+                return WinJudge();
+            }
+            else
+            {
+                PassMid();
+                bestScore = -MidMinMax(depth - 1, true);
+                PassMid();
+            }
+        }
+        else
+        {
+            while (const Move* move = moveList->GetNextBest())
+            {
+                UpdateMid(move);
+                const score_t score = -MidMinMax(depth - 1, false);
+                RestoreMid(move);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                }
+            }
+        }
+
+        return bestScore;
     }
 }

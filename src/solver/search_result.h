@@ -1,14 +1,15 @@
 ﻿#ifndef SEARCH_RESULT_H
 #define SEARCH_RESULT_H
 
+#include "movelist.h"
+
 namespace solver
 {
     struct Move;
-    struct MoveList;
 
     struct SearchResult
     {
-        MoveList* moveList_;
+        MoveList moveList_[1];
 
         Move* GetBestMove();
     };

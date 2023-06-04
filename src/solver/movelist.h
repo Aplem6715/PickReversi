@@ -31,6 +31,7 @@ namespace solver
     public:
         Move* GetNextBest();
         Move* GetNext();
+        bool IsEmpty() { return length_ == 0; }
     };
 
 }

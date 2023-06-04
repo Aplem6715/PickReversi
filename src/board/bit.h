@@ -20,10 +20,6 @@ namespace board
      * 処理性能重視・インライン化のためにヘッダー実装
      */
 
-    /// @brief 位置インデックスをビット変換
-    /// @param posIdx 位置
-    inline uint64_t PosToBit(Position posIdx) { return (uint64_t)0x0000000000000001 << static_cast<int>(posIdx); }
-
     /**
      * @brief 立っているビット数を数える
      *
@@ -256,15 +252,19 @@ namespace board
 
 #pragma warning(push)
 #pragma warning(disable : 4146)
-    /**
-     * @brief 64bit位置情報から位置インデックス（位置番号）を計算
-     *
-     * @param pos64 64bit位置情報
-     * @return Position 位置
-     */
-    inline Position PosIndexFromBit(const uint64_t pos64)
+    ///@brief 64bit位置情報から位置インデックス（位置番号）を計算
+    ///@param bit 64bit位置情報
+    ///@return Position 位置
+    inline Position BitToPos(const uint64_t bit)
     {
-        return static_cast<Position>(tzcnt(pos64));
+        return static_cast<Position>(tzcnt(bit));
+    }
+
+    /// @brief 位置インデックスをビット変換
+    /// @param posIdx 位置
+    inline uint64_t PosToBit(Position posIdx)
+    {
+        return (uint64_t)0x0000000000000001 << static_cast<int>(posIdx);
     }
 
     inline Color AntiColor(Color color)
@@ -278,11 +278,21 @@ namespace board
         return (-bits & bits);
     }
 
+    inline uint64_t PopLSB(uint64_t* bits)
+    {
+        uint64_t lsb = GetLSB(*bits);
+        *bits ^= lsb;
+        return lsb;
+    }
+
     inline Position NextIndex(uint64_t* bits)
     {
         *bits &= *bits - 1;
-        return PosIndexFromBit(*bits);
+        return BitToPos(*bits);
     }
+
+#define for_bits(pos, bits) for (pos = BitToPos(bits); bits; pos = NextIndex(&bits))
+
 #pragma warning(pop)
 }
 

@@ -23,7 +23,7 @@ namespace eval
 
     TEST_F(PositionEvaluator_Test, Update)
     {
-        _eval.Reload(INIT_BLACK, INIT_WHITE, Color::Black);
+        _eval.Reload(INIT_BLACK, INIT_WHITE, Side::Own);
 
         stone_t pos   = 1 << static_cast<int>(Position::C4);
         stone_t flips = 1 << static_cast<int>(Position::D4);
@@ -57,7 +57,7 @@ namespace eval
         board->Put(Position::B2);
         board->Put(Position::A1);
 
-        _eval.Reload(board->GetOwn(), board->GetOpp(), Color::White);
+        _eval.Reload(board->GetOwn(), board->GetOpp(), Side::Opp);
         EXPECT_EQ(_eval.Evaluate(0), -33);
     }
 }

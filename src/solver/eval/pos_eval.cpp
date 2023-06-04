@@ -32,7 +32,7 @@ namespace eval
         return score;
     }
 
-    void PositionEvaluator::Reload(stone_t own, stone_t opp, Color side)
+    void PositionEvaluator::Reload(stone_t own, stone_t opp, Side side)
     {
         _own = own;
         _opp = opp;

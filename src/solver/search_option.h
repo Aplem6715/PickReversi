@@ -5,10 +5,18 @@
 
 namespace solver
 {
+    enum class SearchMethod : uint8_t
+    {
+        MinMax,
+        AlphaBeta,
+        NegaScout,
+    };
+
     struct SearchOption
     {
         uint8_t midDepth_;
         uint8_t endDepth_;
+        SearchMethod method_;
     };
 
     constexpr SearchOption DEFAULT_OPTION = {

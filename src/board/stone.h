@@ -10,37 +10,37 @@ namespace board
     struct Stone
     {
     public:
-        uint64_t own;
-        uint64_t opp;
+        uint64_t own_;
+        uint64_t opp_;
 
         void Swap();
         void Update(uint64_t pos, uint64_t flips);
         void Restore(uint64_t pos, uint64_t flips);
 
-        uint64_t CalcFlip(const Position index) { return CalcFlip64(own, opp, index); }
-        uint64_t CalcMobility() { return CalcMobility64(own, opp); }
+        uint64_t CalcFlip(const Position index) { return CalcFlip64(own_, opp_, index); }
+        uint64_t CalcMobility() { return CalcMobility64(own_, opp_); }
     };
 
     inline void Stone::Swap()
     {
         // 勝手に最適化されるだろう
-        auto temp = own;
-        own       = opp;
-        opp       = temp;
+        auto temp = own_;
+        own_       = opp_;
+        opp_       = temp;
     }
 
     inline void Stone::Update(uint64_t pos, uint64_t flips)
     {
-        own = own ^ (flips | pos);
-        opp = opp ^ flips;
+        own_ = own_ ^ (flips | pos);
+        opp_ = opp_ ^ flips;
         Swap();
     }
 
     inline void Stone::Restore(uint64_t pos, uint64_t flips)
     {
         Swap();
-        own = own ^ flips;
-        opp = opp ^ (flips | pos);
+        own_ = own_ ^ flips;
+        opp_ = opp_ ^ (flips | pos);
     }
 }
 #endif

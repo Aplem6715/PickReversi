@@ -12,9 +12,9 @@ namespace board
 
     struct History
     {
-        uint64_t flip;
-        Position pos;
-        Color side;
+        uint64_t flip_;
+        Position pos_;
+        Color side_;
     };
 
     class Board
@@ -23,9 +23,9 @@ namespace board
         Board();
         ~Board();
 
-        uint64_t GetOwn() { return _side == Color::Black ? _black : _white; }
-        uint64_t GetOpp() { return _side == Color::Black ? _white : _black; }
-        Color GetSide() { return _side; }
+        uint64_t GetOwn() { return side_ == Color::Black ? black_ : white_; }
+        uint64_t GetOpp() { return side_ == Color::Black ? white_ : black_; }
+        Color GetSide() { return side_; }
 
         void Reset();
         bool Skip();
@@ -42,12 +42,12 @@ namespace board
         bool IsFinished();
 
     private:
-        uint64_t _white;
-        uint64_t _black;
+        uint64_t white_;
+        uint64_t black_;
 
-        Color _side;
-        History _history[HIST_LENGTH];
-        int _nbPlayed;
+        Color side_;
+        History history_[HIST_LENGTH];
+        int nbPlayed_;
     };
 }
 

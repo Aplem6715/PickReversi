@@ -35,13 +35,13 @@ namespace solver
 
     private:
         // 盤面
-        Stone _stones[1];
+        Stone stones_[1];
         // 評価関数
-        PositionEvaluator _eval[1];
+        PositionEvaluator eval_[1];
         // 探索深度
-        uint8_t _depth;
+        uint8_t depth_;
         // 探索設定
-        SearchOption _option = DEFAULT_OPTION;
+        SearchOption option_ = DEFAULT_OPTION;
     };
 }
 #endif

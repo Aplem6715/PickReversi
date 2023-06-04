@@ -17,10 +17,10 @@ namespace board
 
     void Board::Reset()
     {
-        _black    = INIT_BLACK;
-        _white    = INIT_WHITE;
-        _side     = Color::Black;
-        _nbPlayed = 0;
+        black_    = INIT_BLACK;
+        white_    = INIT_WHITE;
+        side_     = Color::Black;
+        nbPlayed_ = 0;
     }
 
     bool Board::Skip()
@@ -45,11 +45,11 @@ namespace board
             std::cout << y + 1 << " ";
             for (int x = 0; x < BOARD_SIZE; x++)
             {
-                if (cursor & _black)
+                if (cursor & black_)
                 {
                     std::cout << BLACK_CUI_ICON;
                 }
-                else if (cursor & _white)
+                else if (cursor & white_)
                 {
                     std::cout << WHITE_CUI_ICON;
                 }
@@ -69,61 +69,61 @@ namespace board
         }
         std::cout << "  A B C D E F G H\n";
         std::cout << "    "
-                  << BLACK_CUI_ICON << ":" << (int)CountBits(_black) << "     "
-                  << WHITE_CUI_ICON << ":" << (int)CountBits(_white) << "\n";
+                  << BLACK_CUI_ICON << ":" << (int)CountBits(black_) << "     "
+                  << WHITE_CUI_ICON << ":" << (int)CountBits(white_) << "\n";
         std::cout << "\n";
     }
 
     void Board::ChangeSide()
     {
-        _side = _side == Color::White ? Color::Black : Color::White;
+        side_ = side_ == Color::White ? Color::Black : Color::White;
     }
 
     uint64_t Board::Put(Position pos)
     {
         uint64_t flip;
-        if (_side == Color::Black)
+        if (side_ == Color::Black)
         {
-            flip   = CalcFlip64(_black, _white, pos);
-            _black = _black ^ flip ^ PosToBit(pos);
-            _white = _white ^ flip;
+            flip   = CalcFlip64(black_, white_, pos);
+            black_ = black_ ^ flip ^ PosToBit(pos);
+            white_ = white_ ^ flip;
         }
         else
         {
-            flip   = CalcFlip64(_white, _black, pos);
-            _black = _black ^ flip;
-            _white = _white ^ flip ^ PosToBit(pos);
+            flip   = CalcFlip64(white_, black_, pos);
+            black_ = black_ ^ flip;
+            white_ = white_ ^ flip ^ PosToBit(pos);
         }
         // 着手情報を保存（どっちが，どこに打ち，どこを反転させたか）
-        _history[_nbPlayed].side = _side;
-        _history[_nbPlayed].pos  = pos;
-        _history[_nbPlayed].flip = flip;
-        _nbPlayed++;
+        history_[nbPlayed_].side_ = side_;
+        history_[nbPlayed_].pos_  = pos;
+        history_[nbPlayed_].flip_ = flip;
+        nbPlayed_++;
         ChangeSide();
         return flip;
     }
 
     bool Board::Undo()
     {
-        if (_nbPlayed > 0)
+        if (nbPlayed_ > 0)
         {
-            _nbPlayed--;
+            nbPlayed_--;
 
-            Color hist_turn = _history[_nbPlayed].side;
-            uint64_t flip   = _history[_nbPlayed].flip;
-            uint64_t posBit = PosToBit(_history[_nbPlayed].pos);
+            Color hist_turn = history_[nbPlayed_].side_;
+            uint64_t flip   = history_[nbPlayed_].flip_;
+            uint64_t posBit = PosToBit(history_[nbPlayed_].pos_);
 
             if (hist_turn == Color::Black)
             {
-                _black = _black ^ flip ^ posBit;
-                _white = _white ^ flip;
+                black_ = black_ ^ flip ^ posBit;
+                white_ = white_ ^ flip;
             }
             else
             {
-                _black = _black ^ flip;
-                _white = _white ^ flip ^ posBit;
+                black_ = black_ ^ flip;
+                white_ = white_ ^ flip ^ posBit;
             }
-            _side = hist_turn;
+            side_ = hist_turn;
             return true;
         }
         return false;
@@ -131,10 +131,10 @@ namespace board
 
     bool Board::UndoWhileSameColor()
     {
-        Color oppTurn = AntiColor(_side);
+        Color oppTurn = AntiColor(side_);
         if (Undo())
         {
-            while (_side == oppTurn)
+            while (side_ == oppTurn)
             {
                 if (!Undo())
                     return true;
@@ -151,18 +151,18 @@ namespace board
     {
         if (color == Color::Black)
         {
-            return CountBits(_black);
+            return CountBits(black_);
         }
         else
         {
-            return CountBits(_white);
+            return CountBits(white_);
         }
     }
 
     // TODO: .hに
     uint64_t Board::GetStone(Color color)
     {
-        return color == Color::Black ? _black : _white;
+        return color == Color::Black ? black_ : white_;
     }
 
     bool Board::CanPut()
@@ -172,7 +172,7 @@ namespace board
 
     bool Board::CheckLegalMove(Position pos)
     {
-        if (_nbPlayed >= HIST_LENGTH)
+        if (nbPlayed_ >= HIST_LENGTH)
         {
             return false;
         }
@@ -183,12 +183,12 @@ namespace board
 
     bool Board::IsFinished()
     {
-        if (_nbPlayed >= HIST_LENGTH)
+        if (nbPlayed_ >= HIST_LENGTH)
         {
             return true;
         }
 
-        return (CalcMobility64(_black, _white) == 0) &&
-               (CalcMobility64(_white, _black) == 0);
+        return (CalcMobility64(black_, white_) == 0) &&
+               (CalcMobility64(white_, black_) == 0);
     }
 }

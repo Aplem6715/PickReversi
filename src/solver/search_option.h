@@ -7,13 +7,13 @@ namespace solver
 {
     struct SearchOption
     {
-        uint8_t MidDepth;
-        uint8_t EndDepth;
+        uint8_t midDepth_;
+        uint8_t endDepth_;
     };
 
     constexpr SearchOption DEFAULT_OPTION = {
-        .MidDepth = 8,
-        .EndDepth = 16,
+        .midDepth_ = 8,
+        .endDepth_ = 16,
     };
 } // namespace solver
 

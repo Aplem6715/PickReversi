@@ -15,8 +15,11 @@ constexpr unsigned char BOARD_SIZE = 8;
 constexpr char BLACK_CUI_ICON[] = "X";
 constexpr char WHITE_CUI_ICON[] = "O";
 
-constexpr int OWN = 0;
-constexpr int OPP = 1;
+enum class Side : uint8_t
+{
+    Own,
+    Opp
+};
 
 enum class Color : uint8_t
 {

@@ -6,9 +6,9 @@
 #include <string>
 
 #include "../const.h"
-#include "util/position_helper.h"
 #include "game/player.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
+#include "util/position_helper.h"
 
 namespace game
 {
@@ -93,7 +93,7 @@ namespace game
                 continue;
             }
 
-            logger_ ->info(kPutMessage, currentPlayer->GetName(), PositionHelper::ToString(pos));
+            logger_->info(kPutMessage, currentPlayer->GetName(), PositionHelper::ToString(pos));
 
             board_->Put(pos);
 
@@ -110,17 +110,17 @@ namespace game
 
         if (numBlack == numWhite)
         {
-            std::cout << "引き分け！！\n";
+            logger_->info("引き分け！！");
         }
         else if (numBlack > numWhite)
         {
-            std::cout << kBlackIcon << "の勝ち！\n";
+            logger_->info("{}の勝ち!", kBlackIcon);
         }
         else
         {
-            std::cout << kWhiteIcon << "の勝ち！\n";
+            logger_->info("{}の勝ち!", kWhiteIcon);
         }
-        printf("Enterで終了\n");
+        logger_->info("Enterで終了");
         std::cin.get();
         std::cin.get();
     }

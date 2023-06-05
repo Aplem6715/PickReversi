@@ -2,7 +2,6 @@
 
 namespace solver
 {
-
     Move* solver::MoveList::GetNextBest()
     {
         // 最善手を取得

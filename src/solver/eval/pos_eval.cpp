@@ -21,11 +21,11 @@ namespace eval
         score_t score     = 0;
         const stone_t own = _own;
         const stone_t opp = _opp;
-        for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
+        for (int i = 0; i < kBoardSize * kBoardSize; i++)
         {
             score += ((own >> i) & 1) * ValueTable[i];
         }
-        for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
+        for (int i = 0; i < kBoardSize * kBoardSize; i++)
         {
             score -= ((opp >> i) & 1) * ValueTable[i];
         }

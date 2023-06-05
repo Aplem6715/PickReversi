@@ -45,7 +45,7 @@ namespace board
             return Position::NoMove;
         }
 
-        return static_cast<Position>(63 - (x + y * 8));
+        return static_cast<Position>(x + y * 8);
     }
 
     /**

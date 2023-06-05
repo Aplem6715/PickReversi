@@ -7,7 +7,7 @@
 class ColorHelper
 {
 public:
-    static const std::string ToString(Color color)
+    static const std::wstring ToString(Color color)
     {
         switch (color)
         {

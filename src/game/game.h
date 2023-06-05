@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "board/board.h"
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 #include <memory>
 
 namespace game
@@ -11,16 +11,22 @@ namespace game
 
     class Player;
 
+    enum class PlayerType
+    {
+        Console,
+        AI,
+    };
+
     class Game
     {
     public:
-        Game(Player* blackPlayer, Player* whitePlayer);
+        Game(PlayerType blackPlayer, PlayerType whitePlayer);
         ~Game() {}
 
         void Reset();
         void Play();
-        void SetBlackPlayer(Player* player) { blackPlayer_ = player; }
-        void SetWhitePlayer(Player* player) { whitePlayer_ = player; }
+        void SetBlackPlayer(Player* player);
+        void SetWhitePlayer(Player* player);
 
     private:
         Board board_[1];
@@ -31,6 +37,7 @@ namespace game
     private:
         void MainLoop();
         void ShowResult();
+        Player* MakePlayer(PlayerType type);
 
         Player* GetCurrentPlayer();
         Player* GetOpponentPlayer();

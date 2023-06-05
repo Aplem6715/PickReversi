@@ -24,7 +24,7 @@ namespace game
         virtual void OnOpponentPut(Position pos) {}
 
         /// @brief プレイヤー名を取得（デフォルトは色名）
-        virtual const std::string GetName() { return ColorHelper::ToString(color_); }
+        virtual const std::wstring GetName() { return ColorHelper::ToString(color_); }
 
     protected:
         Color color_;

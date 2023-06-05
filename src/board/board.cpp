@@ -47,11 +47,11 @@ namespace board
             {
                 if (cursor & black_)
                 {
-                    std::cout << kBlackIcon;
+                    std::wcout << kBlackIcon;
                 }
                 else if (cursor & white_)
                 {
-                    std::cout << kWhiteIcon;
+                    std::wcout << kWhiteIcon;
                 }
                 else if (cursor & mobility)
                 {
@@ -68,9 +68,9 @@ namespace board
             std::cout << "\n";
         }
         std::cout << "  A B C D E F G H\n";
-        std::cout << "    "
-                  << kBlackIcon << ":" << (int)CountBits(black_) << "     "
-                  << kWhiteIcon << ":" << (int)CountBits(white_) << "\n";
+        std::wcout << "    "
+                   << kBlackIcon << ":" << (int)CountBits(black_) << "     "
+                   << kWhiteIcon << ":" << (int)CountBits(white_) << "\n";
         std::cout << "\n";
     }
 

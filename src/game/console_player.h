@@ -5,7 +5,7 @@
 
 namespace game
 {
-    class ConsolePlayer : Player
+    class ConsolePlayer : public Player
     {
     public:
         ConsolePlayer() {}

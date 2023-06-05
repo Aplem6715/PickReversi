@@ -40,18 +40,18 @@ namespace board
 
         uint64_t cursor = 0x0000000000000001;
         std::cout << "  A B C D E F G H\n";
-        for (int y = 0; y < BOARD_SIZE; y++)
+        for (int y = 0; y < kBoardSize; y++)
         {
             std::cout << y + 1 << " ";
-            for (int x = 0; x < BOARD_SIZE; x++)
+            for (int x = 0; x < kBoardSize; x++)
             {
                 if (cursor & black_)
                 {
-                    std::cout << BLACK_CUI_ICON;
+                    std::cout << kBlackIcon;
                 }
                 else if (cursor & white_)
                 {
-                    std::cout << WHITE_CUI_ICON;
+                    std::cout << kWhiteIcon;
                 }
                 else if (cursor & mobility)
                 {
@@ -69,8 +69,8 @@ namespace board
         }
         std::cout << "  A B C D E F G H\n";
         std::cout << "    "
-                  << BLACK_CUI_ICON << ":" << (int)CountBits(black_) << "     "
-                  << WHITE_CUI_ICON << ":" << (int)CountBits(white_) << "\n";
+                  << kBlackIcon << ":" << (int)CountBits(black_) << "     "
+                  << kWhiteIcon << ":" << (int)CountBits(white_) << "\n";
         std::cout << "\n";
     }
 

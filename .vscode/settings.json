@@ -4,7 +4,8 @@
         "MOVELIST",
         "Nega",
         "popcnt",
-        "Reversi"
+        "Reversi",
+        "spdlog"
     ],
     "files.associations": {
         "*.txt": "cmake",
@@ -60,7 +61,16 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "bitset": "cpp",
+        "charconv": "cpp",
+        "condition_variable": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "regex": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "thread": "cpp"
     },
     "C_Cpp.vcFormat.space.pointerReferenceAlignment": "right"
 }

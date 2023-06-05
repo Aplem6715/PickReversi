@@ -30,7 +30,7 @@ namespace game
 
     void game::ConsolePlayer::NotifyUndo()
     {
-        logger_.lock()->info("入力待ち");
+        logger_->info("入力待ち");
         std::cin.get();
     }
 }

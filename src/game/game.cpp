@@ -7,6 +7,7 @@
 
 #include "../const.h"
 #include "buffer_sink.h"
+#include "game/ai_player.h"
 #include "game/console_player.h"
 #include "game/player.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
@@ -38,6 +39,7 @@ namespace game
         logger_ = MakeLogger();
         SetBlackPlayer(MakePlayer(blackPlayer));
         SetWhitePlayer(MakePlayer(whitePlayer));
+        logger_->flush();
     }
 
     void Game::Reset()
@@ -64,13 +66,19 @@ namespace game
     void Game::SetBlackPlayer(Player* player)
     {
         blackPlayer_ = player;
-        blackPlayer_->SetColor(Color::Black);
+        if (blackPlayer_)
+        {
+            blackPlayer_->SetColor(Color::Black);
+        }
     }
 
     void Game::SetWhitePlayer(Player* player)
     {
         whitePlayer_ = player;
-        whitePlayer_->SetColor(Color::White);
+        if (whitePlayer_)
+        {
+            whitePlayer_->SetColor(Color::White);
+        }
     }
 
     void Game::MainLoop()
@@ -150,7 +158,9 @@ namespace game
         {
         case PlayerType::Console:
             return new ConsolePlayer();
-            break;
+
+        case PlayerType::AI:
+            return new AIPlayer();
 
         default:
             logger_->error("Player type:{} not defined", static_cast<int>(type));

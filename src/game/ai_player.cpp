@@ -21,7 +21,7 @@ namespace game
     Position game::AIPlayer::Think(uint64_t own, uint64_t opp)
     {
         solver::SearchResult result;
-        searcher_->Search(&result);
+        searcher_->Search(own, opp, &result);
 
         auto best = result.GetBestMove();
         logger_->info("score: {}", best->value_);

@@ -33,10 +33,11 @@ namespace solver
         eval_->Reload(own, opp, Side::Own);
     }
 
-    void Searcher::Search(SearchResult* result)
+    void Searcher::Search(stone_t own, stone_t opp, SearchResult* result)
     {
         Position pos = Position::NoMove;
 
+        SetStones(own, opp);
         if (nbEmpty_ <= option_.endDepth_)
         {
             EndRoot(result);
@@ -49,11 +50,13 @@ namespace solver
 
     void Searcher::MakeMoveList(MoveList* moveList)
     {
-        Move* cursor  = moveList->moves_;
-        Move* prev    = nullptr;
+        Move* prev    = moveList->moves_;
+        Move* cursor  = moveList->moves_ + 1;
         Stone* stones = stones_;
         uint64_t mob  = CalcMobility64(stones->own_, stones->opp_);
         int nbMove    = 0;
+
+        *prev = kDefaultMove;
 
         Position pos;
         for_bits(pos, mob)
@@ -63,23 +66,22 @@ namespace solver
             cursor->value_ = 0;
             cursor->flips_ = stones->CalcFlip(pos);
 
-            if (prev)
-            {
-                prev->next_ = cursor;
-            }
-            prev = cursor;
+            prev->next_ = cursor;
+            prev        = prev->next_;
+            ++cursor;
         }
-        prev->next_       = nullptr;
-        moveList->length_ = nbMove;
+        prev->next_         = nullptr;
+        moveList->length_   = nbMove;
+        moveList->lastMove_ = moveList->moves_;
     }
 
     /* 中盤探索 */
 
     void Searcher::MidRoot(SearchResult* result)
     {
-        score_t lower     = EvalMin;
-        score_t upper     = EvalMax;
-        score_t bestScore = EvalInvalid;
+        score_t lower     = kEvalMin;
+        score_t upper     = kEvalMax;
+        score_t bestScore = kEvalInvalid;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -90,10 +92,10 @@ namespace solver
             score_t score = -MidMinMax(option_.midDepth_, false);
             Restore(move, true);
 
+            move->value_ = score;
             if (score > bestScore)
             {
-                bestScore    = score;
-                move->value_ = score;
+                bestScore = score;
             }
         }
     }
@@ -105,7 +107,7 @@ namespace solver
             return eval_->Evaluate(nbEmpty_);
         }
 
-        score_t bestScore;
+        score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -151,9 +153,9 @@ namespace solver
 
     void Searcher::EndRoot(SearchResult* result)
     {
-        score_t lower     = EvalMin;
-        score_t upper     = EvalMax;
-        score_t bestScore = EvalInvalid;
+        score_t lower     = kEvalMin;
+        score_t upper     = kEvalMax;
+        score_t bestScore = kEvalInvalid;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -161,13 +163,13 @@ namespace solver
         while (Move* move = moveList->GetNextBest())
         {
             Update(move, true);
-            score_t score = -MidMinMax(option_.endDepth_, false);
+            score_t score = -EndMinMax(option_.endDepth_, false);
             Restore(move, true);
 
+            move->value_ = score;
             if (score > bestScore)
             {
-                bestScore    = score;
-                move->value_ = score;
+                bestScore = score;
             }
         }
     }
@@ -176,10 +178,10 @@ namespace solver
     {
         if (depth == 0)
         {
-            return stones_->GetCountDiff();
+            return stones_->GetCountDiff() * kEvalStone;
         }
 
-        score_t bestScore;
+        score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -188,7 +190,7 @@ namespace solver
         {
             if (passed)
             {
-                return WinJudgeEnd();
+                return WinJudgeEnd() * kEvalStone;
             }
             else
             {

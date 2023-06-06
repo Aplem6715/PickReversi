@@ -15,12 +15,6 @@ namespace solver
 
     struct SearchResult;
 
-    /// 1石あたりの評価値
-    constexpr int EvalStone   = 10;
-    constexpr int EvalMax     = EvalStone * 64;
-    constexpr int EvalMin     = -EvalMax;
-    constexpr int EvalInvalid = -999;
-
     class Searcher
     {
     public:
@@ -33,7 +27,7 @@ namespace solver
 
         /// @brief 最善手を検索
         /// @return 最善手
-        void Search(SearchResult* result);
+        void Search(stone_t own, stone_t opp, SearchResult* result);
 
     private:
         // 盤面
@@ -55,8 +49,6 @@ namespace solver
         /* 中盤探索(search_mid.cpp) */
         /// @brief 中盤探索ルート
         void MidRoot(SearchResult* result);
-
-        void PassMid();
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
         score_t MidMinMax(int depth, bool passed);
@@ -101,6 +93,7 @@ namespace solver
         void UpdatePass()
         {
             stones_->Swap();
+            eval_->UpdatePass();
         }
 
         score_t WinJudge()
@@ -108,11 +101,11 @@ namespace solver
             auto diff = stones_->GetCountDiff();
             if (diff > 0)
             {
-                return EvalMax;
+                return kEvalMax;
             }
             else if (diff < 0)
             {
-                return EvalMin;
+                return kEvalMin;
             }
             else
             {

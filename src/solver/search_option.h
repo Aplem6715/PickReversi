@@ -20,8 +20,8 @@ namespace solver
     };
 
     constexpr SearchOption DEFAULT_OPTION = {
-        .midDepth_ = 8,
-        .endDepth_ = 16,
+        .midDepth_ = 4,
+        .endDepth_ = 12,
     };
 } // namespace solver
 

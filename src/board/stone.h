@@ -26,22 +26,22 @@ namespace board
     {
         // 勝手に最適化されるだろう
         auto temp = own_;
-        own_       = opp_;
-        opp_       = temp;
+        own_      = opp_;
+        opp_      = temp;
     }
 
     inline void Stone::Update(uint64_t pos, uint64_t flips)
     {
-        own_ = own_ ^ (flips | pos);
-        opp_ = opp_ ^ flips;
+        own_ ^= (flips | pos);
+        opp_ ^= flips;
         Swap();
     }
 
     inline void Stone::Restore(uint64_t pos, uint64_t flips)
     {
         Swap();
-        own_ = own_ ^ flips;
-        opp_ = opp_ ^ (flips | pos);
+        own_ ^= (flips | pos);
+        opp_ ^= flips;
     }
 
     inline int Stone::GetCountDiff()

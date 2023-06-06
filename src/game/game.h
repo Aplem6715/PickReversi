@@ -32,7 +32,7 @@ namespace game
         Board board_[1];
         Player* blackPlayer_;
         Player* whitePlayer_;
-        std::unique_ptr<spdlog::logger> logger_;
+        std::shared_ptr<spdlog::logger> logger_;
 
     private:
         void MainLoop();

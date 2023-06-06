@@ -19,6 +19,8 @@ namespace solver
         Move* next_;
     };
 
+    const Move kDefaultMove = {0, kEvalInvalid, Position::Invalid, nullptr};
+
     struct MoveList
     {
     public:

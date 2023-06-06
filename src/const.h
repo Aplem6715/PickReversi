@@ -3,15 +3,21 @@
 
 #define GLOBAL_SEED 42
 
-#include <string>
 #include "type.h"
+#include <string>
 
 // 盤面サイズ
 constexpr unsigned char kBoardSize = 8;
 
-const std::wstring kBlackIcon = L"#";
-const std::wstring kWhiteIcon = L"o";
+const std::wstring kBlackIcon   = L"#";
+const std::wstring kWhiteIcon   = L"o";
 const std::wstring kInvalidIcon = L"Err";
+
+/// 1石あたりの評価値
+constexpr int kEvalStone   = 10;
+constexpr int kEvalMax     = kEvalStone * 64;
+constexpr int kEvalMin     = -kEvalMax;
+constexpr int kEvalInvalid = -999;
 
 enum class Side : uint8_t
 {

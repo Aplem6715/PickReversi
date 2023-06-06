@@ -15,12 +15,6 @@ namespace solver
 
     struct SearchResult;
 
-    /// 1石あたりの評価値
-    constexpr int EvalStone   = 10;
-    constexpr int EvalMax     = EvalStone * 64;
-    constexpr int EvalMin     = -EvalMax;
-    constexpr int EvalInvalid = -999;
-
     class Searcher
     {
     public:
@@ -107,11 +101,11 @@ namespace solver
             auto diff = stones_->GetCountDiff();
             if (diff > 0)
             {
-                return EvalMax;
+                return kEvalMax;
             }
             else if (diff < 0)
             {
-                return EvalMin;
+                return kEvalMin;
             }
             else
             {

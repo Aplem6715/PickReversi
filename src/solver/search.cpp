@@ -33,10 +33,11 @@ namespace solver
         eval_->Reload(own, opp, Side::Own);
     }
 
-    void Searcher::Search(SearchResult* result)
+    void Searcher::Search(stone_t own, stone_t opp, SearchResult* result)
     {
         Position pos = Position::NoMove;
 
+        SetStones(own, opp);
         if (nbEmpty_ <= option_.endDepth_)
         {
             EndRoot(result);
@@ -49,8 +50,8 @@ namespace solver
 
     void Searcher::MakeMoveList(MoveList* moveList)
     {
-        Move* cursor  = moveList->moves_;
-        Move* prev    = nullptr;
+        Move* prev    = moveList->moves_;
+        Move* cursor  = moveList->moves_ + 1;
         Stone* stones = stones_;
         uint64_t mob  = CalcMobility64(stones->own_, stones->opp_);
         int nbMove    = 0;
@@ -63,14 +64,12 @@ namespace solver
             cursor->value_ = 0;
             cursor->flips_ = stones->CalcFlip(pos);
 
-            if (prev)
-            {
-                prev->next_ = cursor;
-            }
-            prev = cursor;
+            prev->next_ = cursor;
+            prev        = cursor;
         }
-        prev->next_       = nullptr;
-        moveList->length_ = nbMove;
+        prev->next_         = nullptr;
+        moveList->length_   = nbMove;
+        moveList->lastMove_ = moveList->moves_;
     }
 
     /* 中盤探索 */

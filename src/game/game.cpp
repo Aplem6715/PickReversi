@@ -17,13 +17,13 @@ namespace game
 {
     const std::wstring kSkipMessage       = L"置く場所がありません!{}の手番はパスされました(Enterで次へ)";
     const std::wstring kUndoMessage       = L"「待った!!」（戻しました）";
-    const std::wstring kIllegalPosMessage = L"そこには置けませんが?（#^ω^）";
+    const std::wstring kIllegalPosMessage = L"{}には置けませんが?（#^ω^）";
     const std::wstring kCantUndo          = L"これ以上戻せません";
     const std::wstring kPutMessage        = L"{}が{}に置きました";
 
     std::unique_ptr<spdlog::logger> MakeLogger()
     {
-        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
         consoleSink->set_level(spdlog::level::debug);
         consoleSink->set_pattern("[game] [%^%l%$] %v");
 
@@ -117,7 +117,7 @@ namespace game
 
             if (!board_->CheckLegalMove(pos))
             {
-                logger_->info(kIllegalPosMessage);
+                logger_->info(kIllegalPosMessage, PositionHelper::ToString(pos));
                 continue;
             }
 
@@ -154,19 +154,27 @@ namespace game
 
     Player* Game::MakePlayer(PlayerType type)
     {
+        Player* ret = nullptr;
         switch (type)
         {
         case PlayerType::Console:
-            return new ConsolePlayer();
+            ret = new ConsolePlayer();
+            break;
 
         case PlayerType::AI:
-            return new AIPlayer();
+            ret = new AIPlayer();
+            break;
 
         default:
             logger_->error("Player type:{} not defined", static_cast<int>(type));
             break;
         }
-        return nullptr;
+
+        if (ret)
+        {
+            ret->SetLogger(logger_);
+        }
+        return ret;
     }
 
     Player* Game::GetCurrentPlayer()

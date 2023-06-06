@@ -1,8 +1,12 @@
-﻿
+﻿#include "game/game.h"
+#include <iostream>
 #include <stdio.h>
 
 int main()
 {
-    printf("Hello World");
+    auto game = new game::Game(game::PlayerType::Console, game::PlayerType::AI);
+    game->Play();
+    delete game;
+
     return 0;
 }

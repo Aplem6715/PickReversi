@@ -48,7 +48,7 @@ enum class Position: uint8_t
 // clang-format on
 
 // clang-format off
-const std::wstring POS_NAMES[] = {
+const std::wstring kPosNames[] = {
 	L"A1", L"B1", L"C1", L"D1", L"E1", L"F1", L"G1", L"H1",
 	L"A2", L"B2", L"C2", L"D2", L"E2", L"F2", L"G2", L"H2",
 	L"A3", L"B3", L"C3", L"D3", L"E3", L"F3", L"G3", L"H3",

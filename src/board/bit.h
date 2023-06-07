@@ -4,6 +4,7 @@
 #include "../const.h"
 #include <stdint.h>
 #include <string>
+#include <string_view>
 
 #ifdef INTRINSIC
 #include <intrin.h>
@@ -12,7 +13,6 @@
 namespace board
 {
 
-    Position PosIndexFromAscii(std::string ascii);
     void CalcPosAscii(Position posIdx, char* const x, int* const y);
 
     /**

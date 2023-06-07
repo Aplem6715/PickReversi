@@ -9,8 +9,18 @@ class PositionHelper
 public:
     static const std::wstring ToString(Position pos)
     {
-        return POS_NAMES[static_cast<int>(pos)];
+        return kPosNames[static_cast<int>(pos)];
     }
+    
+    /**
+     * @brief Ascii位置情報から位置番号を計算
+     *
+     * @param ascii Ascii位置情報
+     * @return uint8_t 位置インデックス（位置番号
+     */
+    static Position PosIndexFromAscii(std::string_view ascii);
+
+    static int PositionsFromAscii(std::string_view ascii, Position* moves);
 };
 
 #endif

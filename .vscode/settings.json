@@ -70,7 +70,9 @@
         "regex": "cpp",
         "future": "cpp",
         "mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "codecvt": "cpp",
+        "strstream": "cpp"
     },
     "C_Cpp.vcFormat.space.pointerReferenceAlignment": "right"
 }

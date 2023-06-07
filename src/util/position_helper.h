@@ -7,7 +7,7 @@
 class PositionHelper
 {
 public:
-    static const std::wstring ToString(Position pos)
+    static const std::string ToString(Position pos)
     {
         return kPosNames[static_cast<int>(pos)];
     }

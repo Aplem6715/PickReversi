@@ -1,7 +1,8 @@
 #include "console_player.h"
+#include "game/logger.h"
 #include "util/position_helper.h"
 #include <iostream>
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
 
 namespace game
 {
@@ -30,7 +31,7 @@ namespace game
 
     void game::ConsolePlayer::NotifyUndo()
     {
-        logger_->info("入力待ち");
+        logger_->Info("入力待ち");
         std::cin.get();
     }
 }

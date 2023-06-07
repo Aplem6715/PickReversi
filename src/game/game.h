@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "board/board.h"
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
 #include <memory>
 
 namespace game
@@ -10,6 +10,7 @@ namespace game
     using namespace board;
 
     class Player;
+    class Logger;
 
     enum class PlayerType
     {
@@ -32,7 +33,7 @@ namespace game
         Board board_[1];
         Player* blackPlayer_;
         Player* whitePlayer_;
-        std::shared_ptr<spdlog::logger> logger_;
+        std::shared_ptr<Logger> logger_;
 
     private:
         void MainLoop();

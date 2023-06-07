@@ -80,7 +80,7 @@ namespace record
 
         for (const auto& record : records_)
         {
-            std::wstringstream ss;
+            std::stringstream ss;
 
             // moves_を文字列に変換する
             for (int i = 0; i < record.nMoves_; i++)
@@ -94,8 +94,7 @@ namespace record
 
             ss << " " << record.finalDiff_ << "\n";
 
-            std::wstring ws = ss.str();
-            outfile << std::string(ws.begin(), ws.end());
+            outfile << ss.str();
         }
         outfile.close();
     }

@@ -2,7 +2,8 @@
 
 #include "solver/search.h"
 #include "solver/search_result.h"
-#include <spdlog/spdlog.h>
+#include "game/logger.h"
+// #include <spdlog/spdlog.h>
 
 namespace game
 {
@@ -24,7 +25,7 @@ namespace game
         searcher_->Search(own, opp, &result);
 
         auto best = result.GetBestMove();
-        logger_->info("score: {}", best->value_);
+        logger_->Info("score: " + best->value_);
         return best->pos_;
     }
 }

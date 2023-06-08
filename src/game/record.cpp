@@ -54,23 +54,22 @@ namespace game
 
         while (std::getline(infile, line))
         {
-            std::stringstream ss(line);
             MatchRecord record;
-            std::string moveStr;
+            std::vector<std::string> splitted;
+            std::stringstream ss(line);
 
-            if (line[0] != ' ')
-            { // ランダムムーブ無しだと先頭がスペースに
-                ss >> moveStr;
-                {
-                    record.nRandMoves_ = PositionHelper::PositionsFromAscii(moveStr, record.moves_);
-                    record.nMoves_ += record.nRandMoves_;
-                }
-            }
-            ss >> moveStr;
+            std::string str;
+            while (std::getline(ss, str, ' '))
             {
-                record.nMoves_ += PositionHelper::PositionsFromAscii(moveStr, &record.moves_[record.nRandMoves_]);
+                splitted.push_back(str);
             }
-            ss >> record.finalDiff_;
+
+            record.nRandMoves_ = PositionHelper::PositionsFromAscii(splitted[0], record.moves_);
+            record.nMoves_ += record.nRandMoves_;
+
+            record.nMoves_ += PositionHelper::PositionsFromAscii(splitted[1], &record.moves_[record.nRandMoves_]);
+
+            record.finalDiff_ = std::stoi(splitted[2]);
             records_.push_back(record);
         }
         infile.close();
@@ -98,6 +97,11 @@ namespace game
                     ss << ' ';
                 }
                 ss << PositionHelper::ToString(record.moves_[i]);
+            }
+
+            if(record.nMoves_ == record.nRandMoves_)
+            {
+                ss << ' ';
             }
 
             ss << " " << record.finalDiff_ << "\n";

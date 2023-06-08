@@ -1,8 +1,8 @@
-﻿#include "record/record.h"
+﻿#include "game/record.h"
 
 int main()
 {
-    record::MatchBook book;
+    game::MatchBook book;
     book.ReadAscii("resource/test.txt");
     book.WriteAscii("resource/test_out.txt");
     return 0;

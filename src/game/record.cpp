@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-namespace record
+namespace game
 {
     void MatchBook::Read(std::string path)
     {

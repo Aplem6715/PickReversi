@@ -15,6 +15,17 @@
 			"label": "Build Test",
 			"type": "shell",
 			"command": "cmake --build ${workspaceFolder}/build --target UnitTest -j 10 --"
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"Reversi2023"
+			],
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task"
 		}
 	]
 }

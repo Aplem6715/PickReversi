@@ -4,7 +4,7 @@
 #include "const.h"
 #include <vector>
 
-namespace record
+namespace game
 {
     struct MatchRecord
     {

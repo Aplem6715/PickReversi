@@ -87,6 +87,7 @@ namespace game
             opponentPlayer = GetOpponentPlayer();
             board_->Print();
             logger_->Flush(false);
+            std::cout << '\n';
 
             if (!board_->CanPut())
             {

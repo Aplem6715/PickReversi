@@ -25,7 +25,7 @@ namespace game
         searcher_->Search(own, opp, &result);
 
         auto best = result.GetBestMove();
-        logger_->Info("score: " + best->value_);
+        logger_->Info("score: " + std::to_string(best->value_));
         return best->pos_;
     }
 }

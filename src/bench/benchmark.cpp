@@ -3,7 +3,7 @@
 int main()
 {
     game::MatchBook book;
-    book.ReadAscii("resource/test.txt");
-    book.WriteAscii("resource/test_out.txt");
+    book.ReadAscii("resource/kihu.txt");
+    book.WriteAscii("resource/kihu_out.txt");
     return 0;
 }

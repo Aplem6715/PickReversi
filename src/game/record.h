@@ -8,16 +8,18 @@ namespace game
 {
     struct MatchRecord
     {
-        Position moves_[60];
-        int nRandMoves_;
-        int nMoves_{0};
-        int finalDiff_;
+        Position moves_[60] = {Position::NoMove};
+        int nRandMoves_     = 0;
+        int nMoves_         = 0;
+        int finalDiff_      = 0;
     };
 
     class MatchBook
     {
     public:
         const std::vector<MatchRecord>& GetRecords() const { return records_; }
+
+        void AddRecord(const MatchRecord& record);
 
         void Read(std::string path);
         void Write(std::string path);

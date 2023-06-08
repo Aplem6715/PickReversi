@@ -8,6 +8,11 @@
 
 namespace game
 {
+    void MatchBook::AddRecord(const MatchRecord& record)
+    {
+        records_.push_back(record);
+    }
+
     void MatchBook::Read(std::string path)
     {
         std::ifstream ifs(path, std::ios::binary);
@@ -53,10 +58,13 @@ namespace game
             MatchRecord record;
             std::string moveStr;
 
-            ss >> moveStr;
-            {
-                record.nRandMoves_ = PositionHelper::PositionsFromAscii(moveStr, record.moves_);
-                record.nMoves_ += record.nRandMoves_;
+            if (line[0] != ' ')
+            { // ランダムムーブ無しだと先頭がスペースに
+                ss >> moveStr;
+                {
+                    record.nRandMoves_ = PositionHelper::PositionsFromAscii(moveStr, record.moves_);
+                    record.nMoves_ += record.nRandMoves_;
+                }
             }
             ss >> moveStr;
             {

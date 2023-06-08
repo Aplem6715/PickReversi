@@ -40,6 +40,7 @@ namespace game
     void Game::Reset()
     {
         board_->Reset();
+        record_ = MatchRecord();
     }
 
     void Game::Play()
@@ -102,6 +103,7 @@ namespace game
             {
                 if (board_->UndoWhileSameColor())
                 {
+                    --record_.nMoves_;
                     logger_->Info("「待った!!」（戻しました）");
                 }
                 else
@@ -120,9 +122,12 @@ namespace game
             logger_->Info(currentPlayer->GetName() + "が" + PositionHelper::ToString(pos) + "に置きました");
 
             board_->Put(pos);
+            record_.moves_[record_.nMoves_] = pos;
+            ++record_.nMoves_;
 
             opponentPlayer->OnOpponentPut(pos);
         }
+        record_.finalDiff_ = board_->StoneCount(Color::Black) - board_->StoneCount(Color::White);
     }
 
     void Game::ShowResult()
@@ -144,8 +149,6 @@ namespace game
             logger_->Info(kWhiteIcon + "{}の勝ち!");
         }
         logger_->Info("Enterで終了");
-        std::cin.get();
-        std::cin.get();
     }
 
     Player* Game::MakePlayer(PlayerType type)

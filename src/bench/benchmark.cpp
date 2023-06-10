@@ -67,6 +67,6 @@ int main()
 {
     game::MatchBook book;
     book.ReadAscii("resource/bench/bench_case.txt");
-    bench::BenchMatches(book, "resource/bench/minmax.csv");
+    bench::BenchMatches(book, "resource/bench/alpha_beta.csv");
     return 0;
 }

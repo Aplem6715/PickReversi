@@ -40,8 +40,6 @@ namespace solver
         PositionEvaluator eval_[1];
         // 探索設定
         SearchOption option_ = DEFAULT_OPTION;
-        // 探索深度
-        uint8_t depth_;
         // 空きマス数
         uint8_t nbEmpty_;
 

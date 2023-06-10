@@ -4,8 +4,15 @@
 #include "const.h"
 #include "util/position_helper.h"
 #include <array>
+#include <chrono>
 #include <fstream>
 #include <string>
+
+#if ENABLE_PROFILE
+#define PROFILE(x) x
+#else
+#define PROFILE(x)
+#endif
 
 namespace bench
 {
@@ -24,6 +31,7 @@ namespace bench
         score_t score;
         double duration;
         uint64_t nodeCount;
+        uint64_t leafCount;
 
         HashProfile hash;
     };
@@ -32,7 +40,7 @@ namespace bench
 
     inline void WriteCSVHeader(std::ofstream& file)
     {
-        file << "Pos, Depth, Score, Duration, Node Count, Used, Hit, Rehash, Collide" << std::endl;
+        file << "Pos, Depth, Score, Duration, Node, NPS, Leaf, Used, Hit, Rehash, Collide" << std::endl;
     }
 
     inline void WriteBenchResult(Position pos, const Profile& bench_result, std::ofstream& file)
@@ -42,6 +50,8 @@ namespace bench
              << bench_result.score << ","
              << bench_result.duration << ","
              << bench_result.nodeCount << ","
+             << bench_result.nodeCount / bench_result.duration << ","
+             << bench_result.leafCount << ","
              << bench_result.hash.used << ","
              << bench_result.hash.hit << ","
              << bench_result.hash.rehash << ","

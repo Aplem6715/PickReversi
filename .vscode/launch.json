@@ -46,7 +46,7 @@
             "name": "ベンチマーク(debug)",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/Debug/bin/bench.exe",
+            "program": "${command:cmake.launchTargetDirectory}/bench.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

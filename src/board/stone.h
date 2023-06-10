@@ -19,6 +19,11 @@ namespace board
 
         uint64_t CalcFlip(const Position index) { return CalcFlip64(own_, opp_, index); }
         uint64_t CalcMobility() { return CalcMobility64(own_, opp_); }
+
+        bool operator==(const Stone& other) const
+        {
+            return (own_ == other.own_) && (opp_ == other.opp_);
+        }
     };
 
     inline void Stone::Swap()

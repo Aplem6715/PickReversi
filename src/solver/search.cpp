@@ -93,10 +93,10 @@ namespace solver
 
     void Searcher::MidRoot(SearchResult* result)
     {
-        score_t lower     = kEvalMin - 1;
-        score_t upper     = kEvalMax + 1;
-        score_t bestScore = kEvalInvalid;
-        score_t score;
+        score32_t lower     = kEvalMin - 1;
+        score32_t upper     = kEvalMax + 1;
+        score32_t bestScore = kEvalInvalid;
+        score32_t score;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -134,7 +134,7 @@ namespace solver
         }
     }
 
-    score_t Searcher::MidMinMax(int depth, bool passed)
+    score32_t Searcher::MidMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -143,7 +143,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score_t bestScore = kEvalInvalid;
+        score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -166,7 +166,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -MidMinMax(depth - 1, false);
+                const score32_t score = -MidMinMax(depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -179,7 +179,7 @@ namespace solver
         return bestScore;
     }
 
-    score_t Searcher::MidAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed)
+    score32_t Searcher::MidAlphaBeta(score32_t up_limit, score32_t low_limit, int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -188,7 +188,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score_t bestScore = kEvalInvalid;
+        score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -208,11 +208,11 @@ namespace solver
         }
         else
         {
-            score_t lower = low_limit;
+            score32_t lower = low_limit;
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -MidAlphaBeta(-lower, -up_limit, depth - 1, false);
+                const score32_t score = -MidAlphaBeta(-lower, -up_limit, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -238,10 +238,10 @@ namespace solver
 
     void Searcher::EndRoot(SearchResult* result)
     {
-        score_t lower     = kEvalMin - 1;
-        score_t upper     = kEvalMax + 1;
-        score_t bestScore = kEvalInvalid;
-        score_t score;
+        score32_t lower     = kEvalMin - 1;
+        score32_t upper     = kEvalMax + 1;
+        score32_t bestScore = kEvalInvalid;
+        score32_t score;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -279,7 +279,7 @@ namespace solver
         }
     }
 
-    score_t Searcher::EndMinMax(int depth, bool passed)
+    score32_t Searcher::EndMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -288,7 +288,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score_t bestScore = kEvalInvalid;
+        score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -311,7 +311,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -EndMinMax(depth - 1, false);
+                const score32_t score = -EndMinMax(depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -324,7 +324,7 @@ namespace solver
         return bestScore;
     }
 
-    score_t Searcher::EndAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed)
+    score32_t Searcher::EndAlphaBeta(score32_t up_limit, score32_t low_limit, int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -333,7 +333,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score_t bestScore = kEvalInvalid;
+        score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -353,11 +353,11 @@ namespace solver
         }
         else
         {
-            score_t lower = low_limit;
+            score32_t lower = low_limit;
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -EndAlphaBeta(-lower, -up_limit, depth - 1, false);
+                const score32_t score = -EndAlphaBeta(-lower, -up_limit, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)

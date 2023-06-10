@@ -28,7 +28,7 @@ namespace bench
     {
         int depth;
         Position pos;
-        score_t score;
+        score32_t score;
         double duration;
         uint64_t nodeCount;
         uint64_t leafCount;
@@ -36,6 +36,7 @@ namespace bench
         HashProfile hash;
     };
 
+    constexpr HashProfile kHashProfInit = {0};
     constexpr Profile kProfileInit = {0};
 
     inline void WriteCSVHeader(std::ofstream& file)

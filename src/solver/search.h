@@ -61,20 +61,20 @@ namespace solver
         void MidRoot(SearchResult* result);
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t MidMinMax(int depth, bool passed);
+        score32_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
-        score_t MidAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed);
+        score32_t MidAlphaBeta(score32_t up_limit, score32_t low_limit, int depth, bool passed);
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t EndMinMax(int depth, bool passed);
+        score32_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
-        score_t EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
+        score32_t EndAlphaBeta(score32_t upper, score32_t lower, int depth, bool passed);
 
         /* 探索中に使用するinline関数 */
 
@@ -106,7 +106,7 @@ namespace solver
             eval_->UpdatePass();
         }
 
-        score_t WinJudge()
+        score32_t WinJudge()
         {
             auto diff = stones_->GetCountDiff();
             if (diff > 0)
@@ -123,7 +123,7 @@ namespace solver
             }
         }
 
-        score_t WinJudgeEnd()
+        score32_t WinJudgeEnd()
         {
             auto diff = stones_->GetCountDiff();
             // 空きマスは勝った方に加算される

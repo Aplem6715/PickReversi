@@ -21,7 +21,8 @@ namespace solver
 
     constexpr SearchOption DEFAULT_OPTION = {
         .midDepth_ = 4,
-        .endDepth_ = 12,
+        .endDepth_ = 14,
+        .method_ = SearchMethod::MinMax,
     };
 } // namespace solver
 

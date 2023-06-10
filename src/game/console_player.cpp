@@ -1,7 +1,8 @@
 #include "console_player.h"
-#include "board/bit.h"
+#include "game/logger.h"
+#include "util/position_helper.h"
 #include <iostream>
-#include <spdlog/spdlog.h>
+// #include <spdlog/spdlog.h>
 
 namespace game
 {
@@ -15,7 +16,7 @@ namespace game
             printf("位置を入力してください（A1～H8）:");
             std::cin >> str_pos;
 
-            pos = board::PosIndexFromAscii(str_pos);
+            pos = PositionHelper::PosIndexFromAscii(str_pos);
 
             if (pos == Position::NoMove)
             {
@@ -30,7 +31,7 @@ namespace game
 
     void game::ConsolePlayer::NotifyUndo()
     {
-        logger_->info("入力待ち");
+        logger_->Info("入力待ち");
         std::cin.get();
     }
 }

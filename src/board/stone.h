@@ -6,7 +6,6 @@
 
 namespace board
 {
-
     struct Stone
     {
     public:

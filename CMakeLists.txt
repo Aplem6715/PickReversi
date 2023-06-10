@@ -3,7 +3,7 @@
 #
 cmake_minimum_required(VERSION 3.12)
 
-project ("Reversi2023")
+project ("Reversi2023" LANGUAGES CXX)
 
 # Debugビルドの場合の出力先を指定する
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/Debug/lib)
@@ -15,7 +15,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -DINTRINSIC")
 
 # Debugビルドのみプロファイルを有効に
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DENABLE_PROFILE -pg")
@@ -32,7 +35,6 @@ if(MSVC)
     string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
 endif(MSVC)
 
-add_compile_definitions(INTRINSIC)
 # サブプロジェクトを含めます。
 add_subdirectory ("src")
 

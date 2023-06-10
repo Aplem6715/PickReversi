@@ -5,8 +5,12 @@
 
 #include "board/stone.h"
 #include "eval/pos_eval.h"
-#include "search_option.h"
 #include "movelist.h"
+#include "search_option.h"
+
+#if ENABLE_PROFILE
+#include "bench/bench_result.h"
+#endif
 
 namespace solver
 {
@@ -36,10 +40,16 @@ namespace solver
         PositionEvaluator eval_[1];
         // 探索設定
         SearchOption option_ = DEFAULT_OPTION;
-        // 探索深度
-        uint8_t depth_;
         // 空きマス数
         uint8_t nbEmpty_;
+
+#if ENABLE_PROFILE
+    private:
+        bench::Profile prof_;
+
+    public:
+        const bench::Profile& GetProfile() { return prof_; }
+#endif
 
     private:
         /// @brief 手のリストを作成

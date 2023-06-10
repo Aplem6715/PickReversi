@@ -2,7 +2,8 @@
 #define GAME_H
 
 #include "board/board.h"
-#include <spdlog/spdlog.h>
+#include "record.h"
+// #include <spdlog/spdlog.h>
 #include <memory>
 
 namespace game
@@ -10,6 +11,7 @@ namespace game
     using namespace board;
 
     class Player;
+    class Logger;
 
     enum class PlayerType
     {
@@ -27,12 +29,14 @@ namespace game
         void Play();
         void SetBlackPlayer(Player* player);
         void SetWhitePlayer(Player* player);
+        const MatchRecord& GetRecord() { return record_; }
 
     private:
         Board board_[1];
         Player* blackPlayer_;
         Player* whitePlayer_;
-        std::shared_ptr<spdlog::logger> logger_;
+        MatchRecord record_;
+        std::shared_ptr<Logger> logger_;
 
     private:
         void MainLoop();

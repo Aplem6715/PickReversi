@@ -8,6 +8,7 @@ namespace solver
 {
     Searcher::Searcher()
     {
+        option_ = option_;
     }
 
     Searcher::~Searcher()
@@ -16,6 +17,7 @@ namespace solver
 
     void Searcher::Reset()
     {
+        PROFILE(prof_ = bench::kProfileInit);
     }
 
     void Searcher::Setup(SearchOption option)
@@ -37,15 +39,27 @@ namespace solver
     {
         Position pos = Position::NoMove;
 
+        PROFILE(
+            std::chrono::time_point<std::chrono::high_resolution_clock> start_time;
+            start_time = std::chrono::high_resolution_clock::now();)
+
         SetStones(own, opp);
         if (nbEmpty_ <= option_.endDepth_)
         {
             EndRoot(result);
+            PROFILE(prof_.depth = option_.endDepth_);
         }
         else
         {
             MidRoot(result);
+            PROFILE(prof_.depth = option_.midDepth_);
         }
+
+        PROFILE(
+            std::chrono::time_point<std::chrono::high_resolution_clock> end_time = std::chrono::high_resolution_clock::now();
+            prof_.duration                                                       = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
+            prof_.pos                                                            = pos;
+            prof_.score                                                          = result->GetBestMove()->value_;)
     }
 
     void Searcher::MakeMoveList(MoveList* moveList)
@@ -104,9 +118,11 @@ namespace solver
     {
         if (depth == 0)
         {
+            PROFILE(++prof_.leafCount);
             return eval_->Evaluate(nbEmpty_);
         }
 
+        PROFILE(++prof_.nodeCount);
         score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
@@ -178,9 +194,11 @@ namespace solver
     {
         if (depth == 0)
         {
+            PROFILE(++prof_.leafCount);
             return stones_->GetCountDiff() * kEvalStone;
         }
 
+        PROFILE(++prof_.nodeCount);
         score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 

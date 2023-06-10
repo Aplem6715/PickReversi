@@ -6,45 +6,41 @@
 #include <string>
 
 #include "../const.h"
-#include "buffer_sink.h"
+// #include "buffer_sink.h"
 #include "game/ai_player.h"
 #include "game/console_player.h"
 #include "game/player.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+#include "logger.h"
+// #include "spdlog/sinks/stdout_color_sinks.h"
 #include "util/position_helper.h"
 
 namespace game
 {
-    const std::wstring kSkipMessage       = L"置く場所がありません!{}の手番はパスされました(Enterで次へ)";
-    const std::wstring kUndoMessage       = L"「待った!!」（戻しました）";
-    const std::wstring kIllegalPosMessage = L"{}には置けませんが?（#^ω^）";
-    const std::wstring kCantUndo          = L"これ以上戻せません";
-    const std::wstring kPutMessage        = L"{}が{}に置きました";
+    // std::unique_ptr<spdlog::logger> MakeLogger()
+    // {
+    //     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
+    //     consoleSink->set_level(spdlog::level::debug);
+    //     consoleSink->set_pattern("[game] [%^%l%$] %v");
 
-    std::unique_ptr<spdlog::logger> MakeLogger()
-    {
-        auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_st>();
-        consoleSink->set_level(spdlog::level::debug);
-        consoleSink->set_pattern("[game] [%^%l%$] %v");
+    //     auto bufferSink = std::make_shared<BufferSink_st>(consoleSink);
 
-        auto bufferSink = std::make_shared<BufferSink_st>(consoleSink);
-
-        auto logger = std::make_unique<spdlog::logger>("game", bufferSink);
-        logger->set_level(spdlog::level::debug);
-        return logger;
-    }
+    //     auto logger = std::make_unique<spdlog::logger>("game", bufferSink);
+    //     logger->set_level(spdlog::level::debug);
+    //     return logger;
+    // }
 
     Game::Game(PlayerType blackPlayer, PlayerType whitePlayer)
     {
-        logger_ = MakeLogger();
+        logger_ = std::make_shared<Logger>();
         SetBlackPlayer(MakePlayer(blackPlayer));
         SetWhitePlayer(MakePlayer(whitePlayer));
-        logger_->flush();
+        logger_->Flush();
     }
 
     void Game::Reset()
     {
         board_->Reset();
+        record_ = MatchRecord();
     }
 
     void Game::Play()
@@ -56,7 +52,7 @@ namespace game
 
         Reset();
 
-        logger_->info("対局開始");
+        logger_->Info("対局開始");
 
         MainLoop();
 
@@ -91,11 +87,12 @@ namespace game
             currentPlayer  = GetCurrentPlayer();
             opponentPlayer = GetOpponentPlayer();
             board_->Print();
-            logger_->flush();
+            logger_->Flush(false);
+            std::cout << '\n';
 
             if (!board_->CanPut())
             {
-                logger_->info(kSkipMessage, currentPlayer->GetName());
+                logger_->Info("置く場所がありません!" + currentPlayer->GetName() + "の手番はパスされました(Enterで次へ)");
                 board_->Skip();
                 continue;
             }
@@ -106,27 +103,31 @@ namespace game
             {
                 if (board_->UndoWhileSameColor())
                 {
-                    logger_->info(kUndoMessage, currentPlayer->GetName());
+                    --record_.nMoves_;
+                    logger_->Info("「待った!!」（戻しました）");
                 }
                 else
                 {
-                    logger_->info(kCantUndo);
+                    logger_->Info("これ以上戻せません");
                 }
                 continue;
             }
 
             if (!board_->CheckLegalMove(pos))
             {
-                logger_->info(kIllegalPosMessage, PositionHelper::ToString(pos));
+                logger_->Info(PositionHelper::ToString(pos) + "{}には置けませんが?（#^ω^）");
                 continue;
             }
 
-            logger_->info(kPutMessage, currentPlayer->GetName(), PositionHelper::ToString(pos));
+            logger_->Info(currentPlayer->GetName() + "が" + PositionHelper::ToString(pos) + "に置きました");
 
             board_->Put(pos);
+            record_.moves_[record_.nMoves_] = pos;
+            ++record_.nMoves_;
 
             opponentPlayer->OnOpponentPut(pos);
         }
+        record_.finalDiff_ = board_->StoneCount(Color::Black) - board_->StoneCount(Color::White);
     }
 
     void Game::ShowResult()
@@ -137,19 +138,17 @@ namespace game
 
         if (numBlack == numWhite)
         {
-            logger_->info("引き分け！！");
+            logger_->Info("引き分け！！");
         }
         else if (numBlack > numWhite)
         {
-            logger_->info(L"{}の勝ち!", kBlackIcon);
+            logger_->Info(kBlackIcon + "の勝ち!");
         }
         else
         {
-            logger_->info(L"{}の勝ち!", kWhiteIcon);
+            logger_->Info(kWhiteIcon + "{}の勝ち!");
         }
-        logger_->info("Enterで終了");
-        std::cin.get();
-        std::cin.get();
+        logger_->Info("Enterで終了");
     }
 
     Player* Game::MakePlayer(PlayerType type)
@@ -166,7 +165,7 @@ namespace game
             break;
 
         default:
-            logger_->error("Player type:{} not defined", static_cast<int>(type));
+            logger_->Error("Player type:" + std::to_string(static_cast<int>(type)) + " not defined");
             break;
         }
 

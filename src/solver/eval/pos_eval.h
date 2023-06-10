@@ -10,10 +10,10 @@ namespace eval
     public:
         virtual score_t Evaluate(int nEmpty) override;
 
-        virtual void Reload(stone_t own, stone_t opp, Side side);
-        virtual void Update(stone_t pos, stone_t flips);
-        virtual void Restore(stone_t pos, stone_t flips);
-        virtual void UpdatePass();
+        virtual void Reload(stone_t own, stone_t opp, Side side) override;
+        virtual void Update(stone_t pos, stone_t flips) override;
+        virtual void Restore(stone_t pos, stone_t flips) override;
+        virtual void UpdatePass() override;
 
     private:
         void Swap()

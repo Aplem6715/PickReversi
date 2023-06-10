@@ -1,5 +1,6 @@
 ﻿resource/*
 !resource/.gitkeep
+!resource/bench
 build/*
 !build/.bitkeep
 

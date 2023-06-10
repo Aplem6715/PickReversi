@@ -16,6 +16,9 @@ namespace solver
 
     void Searcher::Reset()
     {
+#if ENABLE_PROFILE
+        prof_ = bench::kProfileInit;
+#endif
     }
 
     void Searcher::Setup(SearchOption option)

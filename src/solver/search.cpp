@@ -93,9 +93,10 @@ namespace solver
 
     void Searcher::MidRoot(SearchResult* result)
     {
-        score_t lower     = kEvalMin;
-        score_t upper     = kEvalMax;
+        score_t lower     = kEvalMin - 1;
+        score_t upper     = kEvalMax + 1;
         score_t bestScore = kEvalInvalid;
+        score_t score;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -103,13 +104,32 @@ namespace solver
         while (Move* move = moveList->GetNextBest())
         {
             Update(move, true);
-            score_t score = -MidMinMax(option_.midDepth_, false);
+            {
+                switch (option_.method_)
+                {
+                case SearchMethod::MinMax:
+                    score = -MidMinMax(option_.midDepth_ - 1, false);
+                    break;
+                case SearchMethod::AlphaBeta:
+                    score = -MidAlphaBeta(-lower, -upper, option_.midDepth_ - 1, false);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid search method specified.");
+                    break;
+                }
+            }
             Restore(move, true);
 
             move->value_ = score;
+
             if (score > bestScore)
             {
                 bestScore = score;
+                // upper以上になること(=カット)はありえない
+                if (bestScore > lower)
+                {
+                    lower = bestScore;
+                }
             }
         }
     }
@@ -137,7 +157,7 @@ namespace solver
             else
             {
                 UpdatePass();
-                bestScore = -MidMinMax(depth - 1, true);
+                bestScore = -MidMinMax(depth, true);
                 UpdatePass();
             }
         }
@@ -159,19 +179,69 @@ namespace solver
         return bestScore;
     }
 
-    score_t Searcher::MidAlphaBeta(score_t upper, score_t lower, int depth, bool passed)
+    score_t Searcher::MidAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed)
     {
-        // TODO: implement
-        return score_t();
+        if (depth == 0)
+        {
+            PROFILE(++prof_.leafCount);
+            return eval_->Evaluate(nbEmpty_);
+        }
+
+        PROFILE(++prof_.nodeCount);
+        score_t bestScore = kEvalInvalid;
+        MoveList moveList[1];
+
+        MakeMoveList(moveList);
+
+        if (moveList->IsEmpty())
+        {
+            if (passed)
+            {
+                return WinJudge();
+            }
+            else
+            {
+                UpdatePass();
+                bestScore = -MidAlphaBeta(-low_limit, -up_limit, depth, true);
+                UpdatePass();
+            }
+        }
+        else
+        {
+            score_t lower = low_limit;
+            while (const Move* move = moveList->GetNextBest())
+            {
+                Update(move, true);
+                const score_t score = -MidAlphaBeta(-lower, -up_limit, depth - 1, false);
+                Restore(move, true);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+
+                    if (score >= up_limit)
+                    {
+                        break;
+                    }
+                    else if (bestScore > lower)
+                    {
+                        lower = bestScore;
+                    }
+                }
+            }
+        }
+
+        return bestScore;
     }
 
     /* 終盤探索 */
 
     void Searcher::EndRoot(SearchResult* result)
     {
-        score_t lower     = kEvalMin;
-        score_t upper     = kEvalMax;
+        score_t lower     = kEvalMin - 1;
+        score_t upper     = kEvalMax + 1;
         score_t bestScore = kEvalInvalid;
+        score_t score;
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -179,13 +249,32 @@ namespace solver
         while (Move* move = moveList->GetNextBest())
         {
             Update(move, true);
-            score_t score = -EndMinMax(option_.endDepth_, false);
+            {
+                switch (option_.method_)
+                {
+                case SearchMethod::MinMax:
+                    score = -EndMinMax(nbEmpty_, false);
+                    break;
+                case SearchMethod::AlphaBeta:
+                    score = -EndAlphaBeta(-lower, -upper, nbEmpty_, false);
+                    break;
+                default:
+                    throw std::invalid_argument("Invalid search method specified.");
+                    break;
+                }
+            }
             Restore(move, true);
 
             move->value_ = score;
+
             if (score > bestScore)
             {
                 bestScore = score;
+                // upper以上になること(=カット)はありえない
+                if (bestScore > lower)
+                {
+                    lower = bestScore;
+                }
             }
         }
     }
@@ -208,12 +297,12 @@ namespace solver
         {
             if (passed)
             {
-                return WinJudgeEnd() * kEvalStone;
+                return stones_->GetCountDiff() * kEvalStone;
             }
             else
             {
                 UpdatePass();
-                bestScore = -EndMinMax(depth - 1, true);
+                bestScore = -EndMinMax(depth, true);
                 UpdatePass();
             }
         }
@@ -235,9 +324,58 @@ namespace solver
         return bestScore;
     }
 
-    score_t Searcher::EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed)
+    score_t Searcher::EndAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed)
     {
-        // TODO: implement
-        return score_t();
+        if (depth == 0)
+        {
+            PROFILE(++prof_.leafCount);
+            return stones_->GetCountDiff() * kEvalStone;
+        }
+
+        PROFILE(++prof_.nodeCount);
+        score_t bestScore = kEvalInvalid;
+        MoveList moveList[1];
+
+        MakeMoveList(moveList);
+
+        if (moveList->IsEmpty())
+        {
+            if (passed)
+            {
+                return stones_->GetCountDiff() * kEvalStone;
+            }
+            else
+            {
+                UpdatePass();
+                bestScore = -EndAlphaBeta(-low_limit, -up_limit, depth, true);
+                UpdatePass();
+            }
+        }
+        else
+        {
+            score_t lower = low_limit;
+            while (const Move* move = moveList->GetNextBest())
+            {
+                Update(move, true);
+                const score_t score = -EndAlphaBeta(-lower, -up_limit, depth - 1, false);
+                Restore(move, true);
+
+                if (score > bestScore)
+                {
+                    bestScore = score;
+
+                    if (score >= up_limit)
+                    {
+                        break;
+                    }
+                    else if (bestScore > lower)
+                    {
+                        lower = bestScore;
+                    }
+                }
+            }
+        }
+
+        return bestScore;
     }
 }

@@ -64,7 +64,7 @@ namespace solver
         score_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
-        score_t MidAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
+        score_t MidAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed);
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート

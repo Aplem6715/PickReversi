@@ -15,6 +15,7 @@ include_directories(../src)
 file(GLOB_RECURSE SOURCE RELATIVE "${CMAKE_SOURCE_DIR}/test" "${CMAKE_SOURCE_DIR}/src/*.cpp" "${CMAKE_SOURCE_DIR}/src/*.h")
 file(GLOB_RECURSE TEST_SOURCE RELATIVE "${CMAKE_SOURCE_DIR}/test" "*.cpp" "*.h")
 list(REMOVE_ITEM SOURCE "../src/main.cpp")
+list(REMOVE_ITEM SOURCE "../src/bench/benchmark.cpp")
 list(REMOVE_ITEM SOURCE "../src/Solver/train/selfplay.cpp")
 
 function(print_list TITLE LIST)

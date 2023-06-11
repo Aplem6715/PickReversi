@@ -2,10 +2,7 @@
 #define HASH_TABLE_H
 
 #include "hash.h"
-
-#if ENABLE_PROFILE
 #include "bench/bench_result.h"
-#endif
 
 namespace solver
 {
@@ -31,7 +28,7 @@ namespace solver
                  uint8_t cost,
                  uint8_t depth);
 
-        PROFILE(void BindProf(bench::HashProfile* prof));
+        PROFILE(void BindProf(bench::HashProfile* prof);)
 
     private:
         uint64_t size_;

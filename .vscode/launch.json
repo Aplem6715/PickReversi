@@ -58,7 +58,7 @@
             "name": "デバッグ",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${command:cmake.launchTargetDirectory}/Reversi2023.exe",
+            "program": "${command:cmake.launchTargetDirectory}/PickReversi.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -73,7 +73,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build Reversi2023"
+            "preLaunchTask": "Build PickReversi"
         },
         {
             "name": "テスト実行",

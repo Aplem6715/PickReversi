@@ -31,8 +31,8 @@ endfunction()
 list(REMOVE_ITEM SOURCE "bench/benchmark.cpp")
 list(REMOVE_ITEM SOURCE "Solver/train/selfplay.cpp")
 # ソースをこのプロジェクトの実行可能ファイルに追加します。
-add_executable(Reversi2023 ${SOURCE})
-# target_link_libraries(Reversi2023 PRIVATE spdlog::spdlog)
+add_executable(PickReversi ${SOURCE})
+# target_link_libraries(PickReversi PRIVATE spdlog::spdlog)
 
 list(REMOVE_ITEM SOURCE "main.cpp")
 

@@ -13,6 +13,10 @@
 #include "bench/bench_result.h"
 #endif
 
+
+#define USE_HASH 0
+
+
 namespace solver
 {
     using namespace board;

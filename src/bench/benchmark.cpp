@@ -67,6 +67,6 @@ int main()
 {
     game::MatchBook book;
     book.ReadAscii("resource/bench/bench_case_hash.txt");
-    bench::BenchMatches(book, "resource/bench/after_hash.csv");
+    bench::BenchMatches(book, "resource/bench/before_hash.csv");
     return 0;
 }

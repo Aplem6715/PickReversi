@@ -1,8 +1,6 @@
 ﻿#ifndef HASH_TABLE_H
 #define HASH_TABLE_H
 
-#define USE_HASH 1
-
 #include "hash.h"
 
 #if ENABLE_PROFILE

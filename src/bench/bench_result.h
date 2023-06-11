@@ -20,7 +20,7 @@ namespace bench
     {
         uint32_t used;
         uint32_t hit;
-        uint32_t rehash;
+        uint32_t hit2nd;
         uint32_t collide;
     };
 
@@ -41,7 +41,7 @@ namespace bench
 
     inline void WriteCSVHeader(std::ofstream& file)
     {
-        file << "Pos, Depth, Score, Duration, Node, NPS, Leaf, Used, Hit, Rehash, Collide" << std::endl;
+        file << "Pos, Depth, Score, Duration, Node, NPS, Leaf, Used, Hit, Hit2nd, Collide" << std::endl;
     }
 
     inline void WriteBenchResult(Position pos, const Profile& bench_result, std::ofstream& file)
@@ -55,7 +55,7 @@ namespace bench
              << bench_result.leafCount << ","
              << bench_result.hash.used << ","
              << bench_result.hash.hit << ","
-             << bench_result.hash.rehash << ","
+             << bench_result.hash.hit2nd << ","
              << bench_result.hash.collide << std::endl;
     }
 

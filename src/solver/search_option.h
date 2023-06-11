@@ -24,7 +24,7 @@ namespace solver
     };
 
     constexpr SearchOption DEFAULT_OPTION = {
-        .midDepth_ = 8,
+        .midDepth_ = 9,
         .endDepth_ = 16,
         .hashSize_ = 1 << 24, // ~= 16[MB]
         .method_ = SearchMethod::AlphaBeta,

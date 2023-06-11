@@ -116,11 +116,10 @@ namespace solver
             return true;
         }
 
-        PROFILE(++prof_->rehash);
         pair = &pairs_[ReHash(index)];
         if (pair->key_ == stones)
         {
-            PROFILE(++prof_->hit);
+            PROFILE(++prof_->hit2nd);
             *data          = pair->value_;
             data->usedVer_ = version_;
             return true;
@@ -143,7 +142,6 @@ namespace solver
         }
 
         // 2nd try
-        PROFILE(++prof_->rehash);
         HashPair* pair2 = &pairs_[ReHash(index)];
         if (pair2->key_ == stones)
         {
@@ -161,7 +159,7 @@ namespace solver
                 ++prof_->collide;
             } //
         )
-        
+
         rewriteTarget->key_ = stones;
         rewriteTarget->value_.Rewrite(upper, lower, score, move, version_, cost, depth);
     }

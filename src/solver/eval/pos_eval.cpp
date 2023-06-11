@@ -1,4 +1,5 @@
 ﻿#include "pos_eval.h"
+#include <algorithm>
 
 namespace eval
 {
@@ -29,6 +30,9 @@ namespace eval
         {
             score -= ((opp >> i) & 1) * ValueTable[i];
         }
+
+        score = std::clamp(score, kEvalMin, kEvalMax);
+
         return score;
     }
 

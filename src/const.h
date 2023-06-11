@@ -14,10 +14,10 @@ const std::string kWhiteIcon   = "o";
 const std::string kInvalidIcon = "Err";
 
 /// 1石あたりの評価値
-constexpr int kEvalStone   = 10;
+constexpr int kEvalStone   = 1;
 constexpr int kEvalMax     = kEvalStone * 64;
 constexpr int kEvalMin     = -kEvalMax;
-constexpr int kEvalInvalid = -999;
+constexpr int kEvalInvalid = -127;
 
 enum class Side : uint8_t
 {

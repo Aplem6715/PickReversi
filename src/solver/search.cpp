@@ -4,35 +4,80 @@
 #include "movelist.h"
 #include "search_result.h"
 
+#include <cassert>
+
 namespace solver
 {
+
+    /// @brief ハッシュデータを元に探索範囲を狭める（またはカット）
+    /// @param hashData ハッシュデータ
+    /// @param depth 探索深度
+    /// @param lower 下限値
+    /// @param upper 上限値
+    /// @param score スコア
+    /// @return カットされるならtrue
+    inline bool ApplyHashRange(const HashData& hashData, const int depth, score32_t* lower, score32_t* upper, score32_t* score)
+    {
+        assert(hashData.lower_ <= hashData.upper_);
+
+        if (hashData.depth_ == depth)
+        {
+            if (hashData.lower_ == hashData.upper_)
+            {
+                *score = hashData.upper_;
+                return true;
+            }
+            if (hashData.upper_ <= *lower)
+            {
+                *score = hashData.upper_;
+                return true;
+            }
+            if (hashData.lower_ >= *upper)
+            {
+                *score = hashData.lower_;
+                return true;
+            }
+
+            *lower = std::max(*lower, static_cast<score32_t>(hashData.lower_));
+            *upper = std::min(*upper, static_cast<score32_t>(hashData.upper_));
+        }
+
+        return false;
+    }
+
     Searcher::Searcher()
     {
         option_ = option_;
+        table_  = new HashTable(option_.hashSize_);
+        PROFILE(table_->BindProf(&prof_.hash));
     }
 
     Searcher::~Searcher()
     {
+        delete table_;
     }
 
     void Searcher::Reset()
     {
+        table_->Clear();
         PROFILE(prof_ = bench::kProfileInit);
     }
 
     void Searcher::Setup(SearchOption option)
     {
         option_ = option;
+        delete table_;
+        table_ = new HashTable(option.hashSize_);
     }
 
     void Searcher::SetStones(stone_t own, stone_t opp)
     {
         nbEmpty_ = CountBits(~(own | opp));
 
-        stones_->own_ = own;
-        stones_->opp_ = opp;
+        stones_.own_ = own;
+        stones_.opp_ = opp;
 
-        eval_->Reload(own, opp, Side::Own);
+        eval_.Reload(own, opp, Side::Own);
     }
 
     void Searcher::Search(stone_t own, stone_t opp, SearchResult* result)
@@ -55,6 +100,8 @@ namespace solver
             PROFILE(prof_.depth = option_.midDepth_);
         }
 
+        table_->VersionUp();
+
         PROFILE(
             std::chrono::time_point<std::chrono::high_resolution_clock> end_time = std::chrono::high_resolution_clock::now();
             prof_.duration                                                       = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count() / 1000.0;
@@ -62,11 +109,21 @@ namespace solver
             prof_.score                                                          = result->GetBestMove()->value_;)
     }
 
+    void Searcher::OnEnterMidSearch()
+    {
+        table_->ClearScore();
+    }
+
+    void Searcher::OnEnterEndSearch()
+    {
+        table_->ClearScore();
+    }
+
     void Searcher::MakeMoveList(MoveList* moveList)
     {
         Move* prev    = moveList->moves_;
         Move* cursor  = moveList->moves_ + 1;
-        Stone* stones = stones_;
+        Stone* stones = &stones_;
         uint64_t mob  = CalcMobility64(stones->own_, stones->opp_);
         int nbMove    = 0;
 
@@ -77,7 +134,7 @@ namespace solver
         {
             ++nbMove;
             cursor->pos_   = pos;
-            cursor->value_ = 0;
+            cursor->value_ = kEvalInvalid;
             cursor->flips_ = stones->CalcFlip(pos);
 
             prev->next_ = cursor;
@@ -96,7 +153,23 @@ namespace solver
         score32_t lower     = kEvalMin - 1;
         score32_t upper     = kEvalMax + 1;
         score32_t bestScore = kEvalInvalid;
+        Position bestMove   = Position::NoMove;
         score32_t score;
+        int depth = option_.midDepth_;
+
+        if (!wasMidSearch)
+        {
+            wasMidSearch = true;
+            OnEnterMidSearch();
+        }
+
+        // RootではHashカットせずMoveOrderingのみで使用
+        HashData hashData;
+        const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->TryGetValue(stones_, hashCode, &hashData);
+        }
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -108,10 +181,10 @@ namespace solver
                 switch (option_.method_)
                 {
                 case SearchMethod::MinMax:
-                    score = -MidMinMax(option_.midDepth_ - 1, false);
+                    score = -MidMinMax(depth - 1, false);
                     break;
                 case SearchMethod::AlphaBeta:
-                    score = -MidAlphaBeta(-lower, -upper, option_.midDepth_ - 1, false);
+                    score = -MidAlphaBeta(-lower, -upper, depth - 1, false);
                     break;
                 default:
                     throw std::invalid_argument("Invalid search method specified.");
@@ -125,12 +198,18 @@ namespace solver
             if (score > bestScore)
             {
                 bestScore = score;
-                // upper以上になること(=カット)はありえない
+                bestMove  = move->pos_;
+                // upperカットはしない
                 if (bestScore > lower)
                 {
                     lower = bestScore;
                 }
             }
+        }
+
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
     }
 
@@ -139,7 +218,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return eval_->Evaluate(nbEmpty_);
+            return eval_.Evaluate(nbEmpty_);
         }
 
         PROFILE(++prof_.nodeCount);
@@ -179,18 +258,37 @@ namespace solver
         return bestScore;
     }
 
-    score32_t Searcher::MidAlphaBeta(score32_t up_limit, score32_t low_limit, int depth, bool passed)
+    score32_t Searcher::MidAlphaBeta(const score32_t upLimit, const score32_t lowLimit, const int depth, const bool passed)
     {
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return eval_->Evaluate(nbEmpty_);
+            return eval_.Evaluate(nbEmpty_);
         }
 
         PROFILE(++prof_.nodeCount);
-        score32_t bestScore = kEvalInvalid;
-        MoveList moveList[1];
 
+        score32_t lower = lowLimit;
+        score32_t upper = upLimit;
+
+        /* Hash Cut */
+        HashData hashData;
+        const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            if (table_->TryGetValue(stones_, hashCode, &hashData))
+            {
+                score32_t score;
+                if (ApplyHashRange(hashData, depth, &lower, &upper, &score))
+                {
+                    return score;
+                }
+            }
+        }
+
+        score32_t bestScore = kEvalInvalid;
+        Position bestMove   = Position::NoMove;
+        MoveList moveList[1];
         MakeMoveList(moveList);
 
         if (moveList->IsEmpty())
@@ -202,24 +300,25 @@ namespace solver
             else
             {
                 UpdatePass();
-                bestScore = -MidAlphaBeta(-low_limit, -up_limit, depth, true);
+                bestScore = -MidAlphaBeta(-lower, -upper, depth, true);
                 UpdatePass();
+                bestMove = Position::Pass;
             }
         }
         else
         {
-            score32_t lower = low_limit;
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -MidAlphaBeta(-lower, -up_limit, depth - 1, false);
+                const score32_t score = -MidAlphaBeta(-lower, -upper, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
                 {
                     bestScore = score;
+                    bestMove  = move->pos_;
 
-                    if (score >= up_limit)
+                    if (score >= upper)
                     {
                         break;
                     }
@@ -229,6 +328,11 @@ namespace solver
                     }
                 }
             }
+        }
+
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
 
         return bestScore;
@@ -241,7 +345,23 @@ namespace solver
         score32_t lower     = kEvalMin - 1;
         score32_t upper     = kEvalMax + 1;
         score32_t bestScore = kEvalInvalid;
+        Position bestMove   = Position::NoMove;
         score32_t score;
+        int depth = nbEmpty_;
+
+        if (wasMidSearch)
+        {
+            wasMidSearch = false;
+            OnEnterEndSearch();
+        }
+
+        // RootではHashカットせずMoveOrderingのみで使用
+        HashData hashData;
+        const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->TryGetValue(stones_, hashCode, &hashData);
+        }
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
@@ -253,10 +373,10 @@ namespace solver
                 switch (option_.method_)
                 {
                 case SearchMethod::MinMax:
-                    score = -EndMinMax(nbEmpty_, false);
+                    score = -EndMinMax(depth - 1, false);
                     break;
                 case SearchMethod::AlphaBeta:
-                    score = -EndAlphaBeta(-lower, -upper, nbEmpty_, false);
+                    score = -EndAlphaBeta(-lower, -upper, depth - 1, false);
                     break;
                 default:
                     throw std::invalid_argument("Invalid search method specified.");
@@ -270,12 +390,18 @@ namespace solver
             if (score > bestScore)
             {
                 bestScore = score;
+                bestMove  = move->pos_;
                 // upper以上になること(=カット)はありえない
                 if (bestScore > lower)
                 {
                     lower = bestScore;
                 }
             }
+        }
+
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
     }
 
@@ -284,7 +410,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return stones_->GetCountDiff() * kEvalStone;
+            return stones_.GetCountDiff() * kEvalStone;
         }
 
         PROFILE(++prof_.nodeCount);
@@ -297,7 +423,7 @@ namespace solver
         {
             if (passed)
             {
-                return stones_->GetCountDiff() * kEvalStone;
+                return stones_.GetCountDiff() * kEvalStone;
             }
             else
             {
@@ -324,47 +450,65 @@ namespace solver
         return bestScore;
     }
 
-    score32_t Searcher::EndAlphaBeta(score32_t up_limit, score32_t low_limit, int depth, bool passed)
+    score32_t Searcher::EndAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed)
     {
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return stones_->GetCountDiff() * kEvalStone;
+            return stones_.GetCountDiff() * kEvalStone;
+        }
+        PROFILE(++prof_.nodeCount);
+
+        score32_t lower   = low_limit;
+        score32_t upper   = up_limit;
+        Position bestMove = Position::NoMove;
+
+        HashData hashData;
+        const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            if (table_->TryGetValue(stones_, hashCode, &hashData))
+            {
+                score32_t score;
+                if (ApplyHashRange(hashData, depth, &lower, &upper, &score))
+                {
+                    return score;
+                }
+            }
         }
 
-        PROFILE(++prof_.nodeCount);
         score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
-
         MakeMoveList(moveList);
 
         if (moveList->IsEmpty())
         {
             if (passed)
             {
-                return stones_->GetCountDiff() * kEvalStone;
+                return stones_.GetCountDiff() * kEvalStone;
             }
             else
             {
                 UpdatePass();
-                bestScore = -EndAlphaBeta(-low_limit, -up_limit, depth, true);
+                bestScore = -EndAlphaBeta(-lower, -upper, depth, true);
                 UpdatePass();
+                bestMove = Position::Pass;
             }
         }
         else
         {
-            score32_t lower = low_limit;
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -EndAlphaBeta(-lower, -up_limit, depth - 1, false);
+                const score32_t score = -EndAlphaBeta(-lower, -upper, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
                 {
                     bestScore = score;
+                    bestMove  = move->pos_;
 
-                    if (score >= up_limit)
+                    if (score >= upper)
                     {
                         break;
                     }
@@ -374,6 +518,11 @@ namespace solver
                     }
                 }
             }
+        }
+
+        if (USE_HASH && depth >= kMidHashDepth)
+        {
+            table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
 
         return bestScore;

@@ -78,7 +78,10 @@
         "concepts": "cpp",
         "format": "cpp",
         "numbers": "cpp",
-        "span": "cpp"
+        "span": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.vcFormat.space.pointerReferenceAlignment": "right",
 }

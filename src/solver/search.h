@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "board/stone.h"
+#include "eval/evaluator.h"
 #include "eval/pos_eval.h"
 #include "hash_table.h"
 #include "movelist.h"
@@ -12,10 +13,6 @@
 #if ENABLE_PROFILE
 #include "bench/bench_result.h"
 #endif
-
-
-#define USE_HASH 0
-
 
 namespace solver
 {
@@ -37,6 +34,10 @@ namespace solver
         /// @brief 最善手を検索
         /// @return 最善手
         void Search(stone_t own, stone_t opp, SearchResult* result);
+
+        const int GetNumEmpty() const { return nbEmpty_; }
+        const Stone& GetStone() const { return stones_; }
+        Evaluator& GetEval() { return eval_; }
 
     private:
         // 盤面

@@ -134,7 +134,7 @@ namespace solver
         {
             ++nbMove;
             cursor->pos_   = pos;
-            cursor->value_ = kEvalInvalid;
+            cursor->value_ = INT32_MIN;
             cursor->flips_ = stones->CalcFlip(pos);
 
             prev->next_ = cursor;
@@ -170,9 +170,18 @@ namespace solver
         {
             table_->TryGetValue(stones_, hashCode, &hashData);
         }
+        else
+        {
+            hashData = kInitHashData;
+        }
 
+        // Move ordering
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
+        if (USE_ORDER)
+        {
+            moveList->Evaluate(*this, hashData);
+        }
 
         while (Move* move = moveList->GetNextBest())
         {
@@ -285,6 +294,10 @@ namespace solver
                 }
             }
         }
+        else
+        {
+            hashData = kInitHashData;
+        }
 
         score32_t bestScore = kEvalInvalid;
         Position bestMove   = Position::NoMove;
@@ -307,6 +320,10 @@ namespace solver
         }
         else
         {
+            if (USE_ORDER && depth >= kMidOrderingDepth)
+            {
+                moveList->Evaluate(*this, hashData);
+            }
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
@@ -362,9 +379,17 @@ namespace solver
         {
             table_->TryGetValue(stones_, hashCode, &hashData);
         }
+        else
+        {
+            hashData = kInitHashData;
+        }
 
         MakeMoveList(result->moveList_);
         MoveList* moveList = result->moveList_;
+        if (USE_ORDER)
+        {
+            moveList->Evaluate(*this, hashData);
+        }
 
         while (Move* move = moveList->GetNextBest())
         {
@@ -476,6 +501,10 @@ namespace solver
                 }
             }
         }
+        else
+        {
+            hashData = kInitHashData;
+        }
 
         score32_t bestScore = kEvalInvalid;
         MoveList moveList[1];
@@ -497,6 +526,10 @@ namespace solver
         }
         else
         {
+            if (USE_ORDER && depth >= kEndOrderingDepth)
+            {
+                moveList->Evaluate(*this, hashData);
+            }
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);

@@ -3,10 +3,15 @@
 
 #include "../const.h"
 
+#define USE_HASH 1
+#define USE_ORDER 1
+
 namespace solver
 {
-    constexpr int kMidHashDepth = 2;
-    constexpr int kEndHashDepth = 6;
+    constexpr int kMidHashDepth  = 2;
+    constexpr int kEndHashDepth  = 6;
+    constexpr int kMidOrderingDepth = 4;
+    constexpr int kEndOrderingDepth = 6;
 
     enum class SearchMethod : uint8_t
     {
@@ -24,10 +29,10 @@ namespace solver
     };
 
     constexpr SearchOption DEFAULT_OPTION = {
-        .midDepth_ = 9,
-        .endDepth_ = 16,
+        .midDepth_ = 10,
+        .endDepth_ = 18,
         .hashSize_ = 1 << 24, // ~= 16[MB]
-        .method_ = SearchMethod::AlphaBeta,
+        .method_   = SearchMethod::AlphaBeta,
     };
 } // namespace solver
 

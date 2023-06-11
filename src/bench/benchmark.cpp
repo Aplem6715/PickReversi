@@ -10,8 +10,8 @@
 
 namespace bench
 {
-    constexpr int kNumPut  = 2;
-    constexpr int kNumIter = 3;
+    constexpr int kNumPut  = 1; // 1手目に同点だけど違う手が選ばれたとき2手目以降の盤面が異なるためベンチマークにならない
+    constexpr int kNumIter = 4;
 
     Position BenchOnePut(board::Board& board, std::ofstream& file)
     {
@@ -49,7 +49,6 @@ namespace bench
             auto pos = BenchOnePut(*board, file);
             board->Put(pos);
         }
-        file << '\n';
     }
 
     void BenchMatches(const game::MatchBook& book, std::string resultFilePath)
@@ -67,6 +66,6 @@ int main()
 {
     game::MatchBook book;
     book.ReadAscii("resource/bench/bench_case_hash.txt");
-    bench::BenchMatches(book, "resource/bench/before_hash.csv");
+    bench::BenchMatches(book, "resource/bench/after_ordering.csv");
     return 0;
 }

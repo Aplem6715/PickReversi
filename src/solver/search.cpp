@@ -166,7 +166,7 @@ namespace solver
         // RootではHashカットせずMoveOrderingのみで使用
         HashData hashData;
         const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.midHashDepth)
         {
             table_->TryGetValue(stones_, hashCode, &hashData);
         }
@@ -216,7 +216,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.midHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
@@ -283,7 +283,7 @@ namespace solver
         /* Hash Cut */
         HashData hashData;
         const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.midHashDepth)
         {
             if (table_->TryGetValue(stones_, hashCode, &hashData))
             {
@@ -320,7 +320,7 @@ namespace solver
         }
         else
         {
-            if (USE_ORDER && depth >= kMidOrderingDepth)
+            if (USE_ORDER && depth >= option_.midOrderingDepth)
             {
                 moveList->Evaluate(*this, hashData);
             }
@@ -347,7 +347,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.midHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
@@ -375,7 +375,7 @@ namespace solver
         // RootではHashカットせずMoveOrderingのみで使用
         HashData hashData;
         const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.endHashDepth)
         {
             table_->TryGetValue(stones_, hashCode, &hashData);
         }
@@ -424,7 +424,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.endHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
@@ -490,7 +490,7 @@ namespace solver
 
         HashData hashData;
         const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.endHashDepth)
         {
             if (table_->TryGetValue(stones_, hashCode, &hashData))
             {
@@ -526,7 +526,7 @@ namespace solver
         }
         else
         {
-            if (USE_ORDER && depth >= kEndOrderingDepth)
+            if (USE_ORDER && depth >= option_.endOrderingDepth)
             {
                 moveList->Evaluate(*this, hashData);
             }
@@ -553,7 +553,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= kMidHashDepth)
+        if (USE_HASH && depth >= option_.endHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }

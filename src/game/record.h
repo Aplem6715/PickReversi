@@ -18,6 +18,7 @@ namespace game
     {
     public:
         const std::vector<MatchRecord>& GetRecords() const { return records_; }
+        std::vector<MatchRecord>& GetRecordEditable() { return records_; }
 
         void AddRecord(const MatchRecord& record);
 

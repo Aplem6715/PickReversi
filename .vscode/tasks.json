@@ -2,9 +2,9 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build Reversi2023",
+			"label": "Build PickReversi",
 			"type": "shell",
-			"command": "cmake --build ${workspaceFolder}/build --target Reversi2023 -j 10 --"
+			"command": "cmake --build ${workspaceFolder}/build --target PickReversi -j 10 --"
 		},
 		{
 			"label": "Build Bench",
@@ -21,7 +21,7 @@
 			"label": "CMake: build",
 			"command": "build",
 			"targets": [
-				"Reversi2023"
+				"PickReversi"
 			],
 			"group": "build",
 			"problemMatcher": [],

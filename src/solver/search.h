@@ -5,12 +5,17 @@
 
 #include "board/stone.h"
 #include "eval/pos_eval.h"
+#include "hash_table.h"
 #include "movelist.h"
 #include "search_option.h"
 
 #if ENABLE_PROFILE
 #include "bench/bench_result.h"
 #endif
+
+
+#define USE_HASH 0
+
 
 namespace solver
 {
@@ -35,13 +40,17 @@ namespace solver
 
     private:
         // 盤面
-        Stone stones_[1];
+        Stone stones_;
         // 評価関数
-        PositionEvaluator eval_[1];
+        PositionEvaluator eval_;
+        // 置換表
+        HashTable* table_;
         // 探索設定
         SearchOption option_ = DEFAULT_OPTION;
         // 空きマス数
         uint8_t nbEmpty_;
+        // 最後の探索が中盤探索だったか
+        bool wasMidSearch;
 
 #if ENABLE_PROFILE
     private:
@@ -52,6 +61,10 @@ namespace solver
 #endif
 
     private:
+        void OnEnterMidSearch();
+
+        void OnEnterEndSearch();
+
         /// @brief 手のリストを作成
         /// @param moveList 手の追加先
         void MakeMoveList(MoveList* moveList);
@@ -61,20 +74,20 @@ namespace solver
         void MidRoot(SearchResult* result);
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t MidMinMax(int depth, bool passed);
+        score32_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
-        score_t MidAlphaBeta(score_t up_limit, score_t low_limit, int depth, bool passed);
+        score32_t MidAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed);
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score_t EndMinMax(int depth, bool passed);
+        score32_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
-        score_t EndAlphaBeta(score_t upper, score_t lower, int depth, bool passed);
+        score32_t EndAlphaBeta(const score32_t upper, const score32_t lower, const int depth, const bool passed);
 
         /* 探索中に使用するinline関数 */
 
@@ -82,10 +95,10 @@ namespace solver
         {
             --nbEmpty_;
             const uint64_t posBit = PosToBit(move->pos_);
-            stones_->Update(posBit, move->flips_);
+            stones_.Update(posBit, move->flips_);
             if (updateEval)
             {
-                eval_->Update(posBit, move->flips_);
+                eval_.Update(posBit, move->flips_);
             }
         }
 
@@ -93,22 +106,22 @@ namespace solver
         {
             ++nbEmpty_;
             const uint64_t posBit = PosToBit(move->pos_);
-            stones_->Restore(posBit, move->flips_);
+            stones_.Restore(posBit, move->flips_);
             if (updateEval)
             {
-                eval_->Restore(posBit, move->flips_);
+                eval_.Restore(posBit, move->flips_);
             }
         }
 
         void UpdatePass()
         {
-            stones_->Swap();
-            eval_->UpdatePass();
+            stones_.Swap();
+            eval_.UpdatePass();
         }
 
-        score_t WinJudge()
+        score32_t WinJudge()
         {
-            auto diff = stones_->GetCountDiff();
+            auto diff = stones_.GetCountDiff();
             if (diff > 0)
             {
                 return kEvalMax;
@@ -123,9 +136,9 @@ namespace solver
             }
         }
 
-        score_t WinJudgeEnd()
+        score32_t WinJudgeEnd()
         {
-            auto diff = stones_->GetCountDiff();
+            auto diff = stones_.GetCountDiff();
             // 空きマスは勝った方に加算される
             if (diff > 0)
             {

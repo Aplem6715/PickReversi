@@ -66,7 +66,7 @@ namespace bench
 int main()
 {
     game::MatchBook book;
-    book.ReadAscii("resource/bench/bench_case.txt");
-    bench::BenchMatches(book, "resource/bench/alpha_beta.csv");
+    book.ReadAscii("resource/bench/bench_case_hash.txt");
+    bench::BenchMatches(book, "resource/bench/before_hash.csv");
     return 0;
 }

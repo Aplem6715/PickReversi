@@ -18,7 +18,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/bin)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -DINTRINSIC -finput-charset=UTF-8 -fexec-charset=CP932")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -DINTRINSIC -finput-charset=UTF-8 -fexec-charset=UTF-8")
 
 # Debugビルドのみプロファイルを有効に
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg")

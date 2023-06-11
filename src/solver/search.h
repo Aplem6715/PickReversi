@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "board/stone.h"
+#include "eval/evaluator.h"
 #include "eval/pos_eval.h"
 #include "hash_table.h"
 #include "movelist.h"
@@ -12,10 +13,6 @@
 #if ENABLE_PROFILE
 #include "bench/bench_result.h"
 #endif
-
-
-#define USE_HASH 0
-
 
 namespace solver
 {
@@ -38,6 +35,10 @@ namespace solver
         /// @return 最善手
         void Search(stone_t own, stone_t opp, SearchResult* result);
 
+        const int GetNumEmpty() const { return nbEmpty_; }
+        const Stone& GetStone() const { return stones_; }
+        Evaluator& GetEval() { return eval_; }
+
     private:
         // 盤面
         Stone stones_;
@@ -46,11 +47,11 @@ namespace solver
         // 置換表
         HashTable* table_;
         // 探索設定
-        SearchOption option_ = DEFAULT_OPTION;
+        SearchOption option_ = kDefaultOption;
         // 空きマス数
         uint8_t nbEmpty_;
         // 最後の探索が中盤探索だったか
-        bool wasMidSearch;
+        bool wasMidSearch_;
 
 #if ENABLE_PROFILE
     private:

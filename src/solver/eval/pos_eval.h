@@ -5,7 +5,9 @@
 
 namespace eval
 {
-    class PositionEvaluator : Evaluator
+    extern const score32_t ValueTable[64];
+    
+    class PositionEvaluator : public Evaluator
     {
     public:
         virtual score32_t Evaluate(int nEmpty) override;

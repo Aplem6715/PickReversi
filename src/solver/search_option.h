@@ -28,7 +28,7 @@ namespace solver
         int endOrderingDepth;
     };
 
-    constexpr SearchOption DEFAULT_OPTION = {
+    constexpr SearchOption kDefaultOption = {
         .midDepth_ = 10,
         .endDepth_ = 18,
         .hashSize_ = 1 << 24, // ~= 16[MB]

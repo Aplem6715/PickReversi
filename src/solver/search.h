@@ -47,11 +47,11 @@ namespace solver
         // 置換表
         HashTable* table_;
         // 探索設定
-        SearchOption option_ = DEFAULT_OPTION;
+        SearchOption option_ = kDefaultOption;
         // 空きマス数
         uint8_t nbEmpty_;
         // 最後の探索が中盤探索だったか
-        bool wasMidSearch;
+        bool wasMidSearch_;
 
 #if ENABLE_PROFILE
     private:

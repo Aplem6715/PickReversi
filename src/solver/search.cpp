@@ -157,9 +157,9 @@ namespace solver
         score32_t score;
         int depth = option_.midDepth_;
 
-        if (!wasMidSearch)
+        if (!wasMidSearch_)
         {
-            wasMidSearch = true;
+            wasMidSearch_ = true;
             OnEnterMidSearch();
         }
 
@@ -366,9 +366,9 @@ namespace solver
         score32_t score;
         int depth = nbEmpty_;
 
-        if (wasMidSearch)
+        if (wasMidSearch_)
         {
-            wasMidSearch = false;
+            wasMidSearch_ = false;
             OnEnterEndSearch();
         }
 

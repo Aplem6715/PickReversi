@@ -2,16 +2,15 @@
 
 #include "solver/search.h"
 #include "solver/search_result.h"
+#include "solver/eval/pos_eval.h"
 #include "game/logger.h"
 // #include <spdlog/spdlog.h>
 
 namespace game
 {
-    using namespace solver;
-
     AIPlayer::AIPlayer()
     {
-        searcher_ = new Searcher();
+        searcher_ = new solver::Searcher<eval::PositionEvaluator>();
     }
 
     AIPlayer::~AIPlayer()

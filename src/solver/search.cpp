@@ -1,6 +1,7 @@
 ﻿#include "search.h"
 #include "board/bit.h"
 #include "board/stone.h"
+#include "eval/pos_eval.h"
 #include "movelist.h"
 #include "search_result.h"
 
@@ -8,6 +9,9 @@
 
 namespace solver
 {
+    template class Searcher<eval::PositionEvaluator>;
+
+    using Stone = board::Stone;
 
     /// @brief ハッシュデータを元に探索範囲を狭める（またはカット）
     /// @param hashData ハッシュデータ
@@ -45,32 +49,37 @@ namespace solver
         return false;
     }
 
-    Searcher::Searcher()
+    template <class Evaluator>
+    Searcher<Evaluator>::Searcher()
     {
         option_ = option_;
         table_  = new HashTable(option_.hashSize_);
         PROFILE(table_->BindProf(&prof_.hash));
     }
 
-    Searcher::~Searcher()
+    template <class Evaluator>
+    Searcher<Evaluator>::~Searcher()
     {
         delete table_;
     }
 
-    void Searcher::Reset()
+    template <class Evaluator>
+    void Searcher<Evaluator>::Reset()
     {
         table_->Clear();
         PROFILE(prof_ = bench::kProfileInit);
     }
 
-    void Searcher::Setup(SearchOption option)
+    template <class Evaluator>
+    void Searcher<Evaluator>::Setup(SearchOption option)
     {
         option_ = option;
         delete table_;
         table_ = new HashTable(option.hashSize_);
     }
 
-    void Searcher::SetStones(stone_t own, stone_t opp)
+    template <class Evaluator>
+    void Searcher<Evaluator>::SetStones(stone_t own, stone_t opp)
     {
         nbEmpty_ = CountBits(~(own | opp));
 
@@ -80,7 +89,8 @@ namespace solver
         eval_.Reload(own, opp, Side::Own);
     }
 
-    void Searcher::Search(stone_t own, stone_t opp, SearchResult* result)
+    template <class Evaluator>
+    void Searcher<Evaluator>::Search(stone_t own, stone_t opp, SearchResult* result)
     {
         Position pos = Position::NoMove;
 
@@ -109,17 +119,20 @@ namespace solver
             prof_.score                                                          = result->GetBestMove()->value_;)
     }
 
-    void Searcher::OnEnterMidSearch()
+    template <class Evaluator>
+    void Searcher<Evaluator>::OnEnterMidSearch()
     {
         table_->ClearScore();
     }
 
-    void Searcher::OnEnterEndSearch()
+    template <class Evaluator>
+    void Searcher<Evaluator>::OnEnterEndSearch()
     {
         table_->ClearScore();
     }
 
-    void Searcher::MakeMoveList(MoveList* moveList)
+    template <class Evaluator>
+    void Searcher<Evaluator>::MakeMoveList(MoveList* moveList)
     {
         Move* prev    = moveList->moves_;
         Move* cursor  = moveList->moves_ + 1;
@@ -148,7 +161,8 @@ namespace solver
 
     /* 中盤探索 */
 
-    void Searcher::MidRoot(SearchResult* result)
+    template <class Evaluator>
+    void Searcher<Evaluator>::MidRoot(SearchResult* result)
     {
         score32_t lower     = kEvalMin - 1;
         score32_t upper     = kEvalMax + 1;
@@ -222,7 +236,8 @@ namespace solver
         }
     }
 
-    score32_t Searcher::MidMinMax(int depth, bool passed)
+    template <class Evaluator>
+    score32_t Searcher<Evaluator>::MidMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -267,7 +282,8 @@ namespace solver
         return bestScore;
     }
 
-    score32_t Searcher::MidAlphaBeta(const score32_t upLimit, const score32_t lowLimit, const int depth, const bool passed)
+    template <class Evaluator>
+    score32_t Searcher<Evaluator>::MidAlphaBeta(const score32_t upLimit, const score32_t lowLimit, const int depth, const bool passed)
     {
         if (depth == 0)
         {
@@ -357,7 +373,8 @@ namespace solver
 
     /* 終盤探索 */
 
-    void Searcher::EndRoot(SearchResult* result)
+    template <class Evaluator>
+    void Searcher<Evaluator>::EndRoot(SearchResult* result)
     {
         score32_t lower     = kEvalMin - 1;
         score32_t upper     = kEvalMax + 1;
@@ -430,7 +447,8 @@ namespace solver
         }
     }
 
-    score32_t Searcher::EndMinMax(int depth, bool passed)
+    template <class Evaluator>
+    score32_t Searcher<Evaluator>::EndMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -475,7 +493,8 @@ namespace solver
         return bestScore;
     }
 
-    score32_t Searcher::EndAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed)
+    template <class Evaluator>
+    score32_t Searcher<Evaluator>::EndAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed)
     {
         if (depth == 0)
         {

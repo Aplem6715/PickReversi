@@ -4,8 +4,6 @@
 #include <vector>
 
 #include "board/stone.h"
-#include "eval/evaluator.h"
-#include "eval/pos_eval.h"
 #include "hash_table.h"
 #include "movelist.h"
 #include "search_option.h"
@@ -16,11 +14,9 @@
 
 namespace solver
 {
-    using namespace board;
-    using namespace eval;
-
     struct SearchResult;
 
+    template <class Evaluator>
     class Searcher
     {
     public:
@@ -36,14 +32,14 @@ namespace solver
         void Search(stone_t own, stone_t opp, SearchResult* result);
 
         const int GetNumEmpty() const { return nbEmpty_; }
-        const Stone& GetStone() const { return stones_; }
+        const board::Stone& GetStone() const { return stones_; }
         Evaluator& GetEval() { return eval_; }
 
     private:
         // 盤面
-        Stone stones_;
+        board::Stone stones_;
         // 評価関数
-        PositionEvaluator eval_;
+        Evaluator eval_;
         // 置換表
         HashTable* table_;
         // 探索設定
@@ -155,5 +151,6 @@ namespace solver
             }
         }
     };
-}
+
+} // namespace solver
 #endif

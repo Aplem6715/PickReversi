@@ -1,21 +1,21 @@
 ﻿#ifndef POS_EVAL_H
 #define POS_EVAL_H
 
-#include "evaluator.h"
+#include "const.h"
 
 namespace eval
 {
     extern const score32_t ValueTable[64];
-    
-    class PositionEvaluator : public Evaluator
+
+    class PositionEvaluator
     {
     public:
-        virtual score32_t Evaluate(int nEmpty) override;
+        virtual score32_t Evaluate(int nEmpty);
 
-        virtual void Reload(stone_t own, stone_t opp, Side side) override;
-        virtual void Update(stone_t pos, stone_t flips) override;
-        virtual void Restore(stone_t pos, stone_t flips) override;
-        virtual void UpdatePass() override;
+        virtual void Reload(stone_t own, stone_t opp, Side side);
+        virtual void Update(stone_t pos, stone_t flips);
+        virtual void Restore(stone_t pos, stone_t flips);
+        virtual void UpdatePass();
 
     private:
         void Swap()

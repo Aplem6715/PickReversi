@@ -1,6 +1,7 @@
 ﻿
 #include "board/board.h"
 #include "game/record.h"
+#include "solver/eval/pos_eval.h"
 #include "solver/search.h"
 #include "solver/search_option.h"
 #include "solver/search_result.h"
@@ -10,7 +11,7 @@
 // TEST(Search, MakeFixedStates)
 // {
 //     game::MatchBook book;
-//     solver::Searcher searcher[1];
+//     solver::Searcher<eval::PositionEvaluator> searcher[1];
 //     auto option    = solver::kAccuracyTestOption;
 //     option.method_ = solver::SearchMethod::MinMax;
 //     searcher->Setup(option);
@@ -45,7 +46,7 @@
 TEST(Search, ReproducibilityCheck)
 {
     game::MatchBook book;
-    solver::Searcher searcher[1];
+    solver::Searcher<eval::PositionEvaluator> searcher[1];
     searcher->Setup(solver::kAccuracyTestOption);
     book.ReadAscii("resource/test/search_test.txt");
 

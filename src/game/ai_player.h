@@ -3,8 +3,14 @@
 
 #include "player.h"
 
+namespace eval
+{
+    class PositionEvaluator;
+}
+
 namespace solver
 {
+    template <class Evaluator>
     class Searcher;
 }
 
@@ -21,7 +27,7 @@ namespace game
         virtual void NotifyUndo() override {} /*なにもしない*/
 
     private:
-        solver::Searcher* searcher_;
+        solver::Searcher<eval::PositionEvaluator>* searcher_;
     };
 }
 

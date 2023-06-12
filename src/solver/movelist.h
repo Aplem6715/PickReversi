@@ -6,7 +6,9 @@
 namespace solver
 {
 
+    template <class Evaluator>
     class Searcher;
+
     struct HashData;
 
     // 1盤面における最大着手可能位置数
@@ -21,10 +23,11 @@ namespace solver
         Position pos_;
         Move* next_;
 
-        void Evaluate(Searcher& searcher, const HashData& hashData);
+        template <class Evaluator>
+        void Evaluate(Searcher<Evaluator>& searcher, const HashData& hashData);
     };
 
-    const Move kDefaultMove = {0, INT32_MIN, Position::Invalid, nullptr};
+    constexpr Move kDefaultMove = {0, INT32_MIN, Position::Invalid, nullptr};
 
     struct MoveList
     {
@@ -38,8 +41,16 @@ namespace solver
     public:
         Move* GetNextBest();
         Move* GetNext();
-        void Evaluate(Searcher& searcher, const HashData& hashData);
         bool IsEmpty() { return length_ == 0; }
+
+        template <class Evaluator>
+        void Evaluate(Searcher<Evaluator>& searcher, const HashData& hashData)
+        {
+            for (auto move = moves_->next_; move; move = move->next_)
+            {
+                move->Evaluate<Evaluator>(searcher, hashData);
+            }
+        }
     };
 
 }

@@ -9,7 +9,7 @@
 
 namespace solver
 {
-    template class Searcher<eval::PositionEvaluator>;
+    template class Searcher<eval::PositionEval>;
 
     using Stone = board::Stone;
 
@@ -86,7 +86,7 @@ namespace solver
         stones_.own_ = own;
         stones_.opp_ = opp;
 
-        eval_.Reload(own, opp, Side::Own);
+        eval_.Reload(own, opp);
     }
 
     template <class Evaluator>

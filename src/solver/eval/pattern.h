@@ -32,8 +32,9 @@ namespace eval
     constexpr int kShapeDiag8  = 7;
     constexpr int kShapeEdge   = 8;
     constexpr int kShapeCorner = 9;
-    constexpr int kShapeBox10  = 10;
-    constexpr int kShapeNum    = 11;
+    constexpr int kShapeArrow  = 10;
+    constexpr int kShapeMiddle = 11;
+    constexpr int kShapeNum    = 12;
 
     // 3^9 x 4 = 78,732
     constexpr int kPatternLine2_1 = 0; // 3^9
@@ -93,15 +94,17 @@ namespace eval
     constexpr int kPatternConer_3 = 36;
     constexpr int kPatternConer_4 = 37;
 
-    // 3^8 x 4 = 708,588
-    constexpr int kPatternBox10_1 = 38;
-    constexpr int kPatternBox10_2 = 39;
-    constexpr int kPatternBox10_3 = 40;
-    constexpr int kPatternBox10_4 = 41;
-    constexpr int kPatternBox10_5 = 42;
-    constexpr int kPatternBox10_6 = 43;
-    constexpr int kPatternBox10_7 = 44;
-    constexpr int kPatternBox10_8 = 45;
+    // 3^10 x 4 = 708,588
+    constexpr int kPatternArrow_1 = 38;
+    constexpr int kPatternArrow_2 = 39;
+    constexpr int kPatternArrow_3 = 40;
+    constexpr int kPatternArrow_4 = 41;
+
+    // 3^10 x 4 = 708,588
+    constexpr int kPatternMidle_1 = 42;
+    constexpr int kPatternMidle_2 = 43;
+    constexpr int kPatternMidle_3 = 44;
+    constexpr int kPatternMidle_4 = 45;
 
     constexpr int kPatternNum = 46;
 
@@ -120,22 +123,38 @@ namespace eval
         7, 7,           // DIAG8
         8, 8, 8, 8,     // EDGE
         9, 9, 9, 9,     // CORNER
-        10, 10, 10, 10, // BOX10
-        10, 10, 10, 10  // BOX10-2
+        10, 10, 10, 10, // ARROW
+        10, 10, 10, 10, // MIDDLE
     };
 
     constexpr uint32_t kPatternIndexMax[kShapeNum] = {
-        8,  // LINE2
-        8,  // LINE3
-        8,  // LINE4
-        4,  // DIAG4
-        5,  // DIAG5
-        6,  // DIAG6
-        7,  // DIAG7
-        8,  // DIAG8
-        10, // EDGE
-        9,  // CORNER
-        10, // BOX10
+        kPow3_8,  // LINE2
+        kPow3_8,  // LINE3
+        kPow3_8,  // LINE4
+        kPow3_4,  // DIAG4
+        kPow3_5,  // DIAG5
+        kPow3_6,  // DIAG6
+        kPow3_7,  // DIAG7
+        kPow3_8,  // DIAG8
+        kPow3_10, // EDGE
+        kPow3_9,  // CORNER
+        kPow3_10, // ARROW
+        kPow3_10, // MIDDLE
+    };
+
+    constexpr uint32_t kPatternOffset[] = {
+        0, 0, 0, 0,
+        kPatternIndexMax[0], kPatternIndexMax[0], kPatternIndexMax[0], kPatternIndexMax[0],     // LINE2
+        kPatternIndexMax[1], kPatternIndexMax[1], kPatternIndexMax[1], kPatternIndexMax[1],     // LINE3
+        kPatternIndexMax[2], kPatternIndexMax[2], kPatternIndexMax[2], kPatternIndexMax[2],     // DIAG4
+        kPatternIndexMax[3], kPatternIndexMax[3], kPatternIndexMax[3], kPatternIndexMax[3],     // DIAG5
+        kPatternIndexMax[4], kPatternIndexMax[4], kPatternIndexMax[4], kPatternIndexMax[4],     // DIAG6
+        kPatternIndexMax[5], kPatternIndexMax[5], kPatternIndexMax[5], kPatternIndexMax[5],     // DIAG7
+        kPatternIndexMax[6], kPatternIndexMax[6],                                               // DIAG8
+        kPatternIndexMax[7], kPatternIndexMax[7], kPatternIndexMax[7], kPatternIndexMax[7],     // EDGE
+        kPatternIndexMax[8], kPatternIndexMax[8], kPatternIndexMax[8], kPatternIndexMax[8],     // CORNER
+        kPatternIndexMax[9], kPatternIndexMax[9], kPatternIndexMax[9], kPatternIndexMax[9],     // ARROW
+        kPatternIndexMax[10], kPatternIndexMax[10], kPatternIndexMax[10], kPatternIndexMax[10], // MIDDLE
     };
 
     inline int Phase(int nbEmpty) { return nbEmpty / kNumPut1Phase; }

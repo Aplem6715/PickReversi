@@ -5,7 +5,7 @@
 
 namespace solver
 {
-    template void Move::Evaluate<eval::PositionEvaluator>(Searcher<eval::PositionEvaluator>& searcher, const HashData& hashData);
+    template void Move::Evaluate<eval::PositionEval>(Searcher<eval::PositionEval>& searcher, const HashData& hashData);
 
     Move* solver::MoveList::GetNextBest()
     {
@@ -98,9 +98,9 @@ namespace solver
 
             // 一手読みのスコア付け（16~8bit目)
             // 着手して相手のターンに進める
-            eval.Update(posBit, flips);
+            eval.Update(pos, flips);
             const score32_t score = eval.Evaluate(searcher.GetNumEmpty() - 1);
-            eval.Restore(posBit, flips);
+            eval.Restore(pos, flips);
             value -= score * (1 << kOneStepScoreOrder);
 
             // 着手位置でスコア付け(8~0bit)

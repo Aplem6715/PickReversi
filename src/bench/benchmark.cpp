@@ -16,7 +16,7 @@ namespace bench
 
     Position BenchOnePut(board::Board& board, std::ofstream& file)
     {
-        solver::Searcher<eval::PositionEvaluator> searcher[1];
+        solver::Searcher<eval::PositionEval> searcher[1];
         solver::SearchResult result[1];
         Position pos;
 

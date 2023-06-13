@@ -7,15 +7,15 @@ namespace eval
 {
     extern const score32_t ValueTable[64];
 
-    class PositionEvaluator
+    class PositionEval
     {
     public:
-        virtual score32_t Evaluate(int nEmpty);
+        score32_t Evaluate(int nEmpty);
 
-        virtual void Reload(stone_t own, stone_t opp, Side side);
-        virtual void Update(stone_t pos, stone_t flips);
-        virtual void Restore(stone_t pos, stone_t flips);
-        virtual void UpdatePass();
+        void Reload(stone_t own, stone_t opp);
+        void Update(Position pos, stone_t flips);
+        void Restore(Position pos, stone_t flips);
+        void UpdatePass();
 
     private:
         void Swap()

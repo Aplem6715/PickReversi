@@ -10,7 +10,7 @@ namespace game
 {
     AIPlayer::AIPlayer()
     {
-        searcher_ = new solver::Searcher<eval::PositionEvaluator>();
+        searcher_ = new solver::Searcher<eval::PositionEval>();
     }
 
     AIPlayer::~AIPlayer()

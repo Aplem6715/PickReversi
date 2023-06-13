@@ -1,4 +1,5 @@
 ﻿#include "pos_eval.h"
+#include "board/bit.h"
 #include <algorithm>
 
 namespace eval
@@ -17,7 +18,7 @@ namespace eval
     };
     // clang-format on
 
-    score32_t PositionEvaluator::Evaluate(int nEmpty)
+    score32_t PositionEval::Evaluate(int nEmpty)
     {
         score32_t score     = 0;
         const stone_t own = _own;
@@ -36,27 +37,27 @@ namespace eval
         return score;
     }
 
-    void PositionEvaluator::Reload(stone_t own, stone_t opp, Side side)
+    void PositionEval::Reload(stone_t own, stone_t opp)
     {
         _own = own;
         _opp = opp;
     }
 
-    void PositionEvaluator::Update(stone_t pos, stone_t flips)
+    void PositionEval::Update(Position pos, stone_t flips)
     {
-        _own = _own ^ (flips | pos);
+        _own = _own ^ (flips | PosToBit(pos));
         _opp = _opp ^ flips;
         Swap();
     }
 
-    void PositionEvaluator::Restore(stone_t pos, stone_t flips)
+    void PositionEval::Restore(Position pos, stone_t flips)
     {
         Swap();
-        _own = _own ^ (flips | pos);
+        _own = _own ^ (flips | PosToBit(pos));
         _opp = _opp ^ flips;
     }
 
-    void PositionEvaluator::UpdatePass()
+    void PositionEval::UpdatePass()
     {
         Swap();
     }

@@ -91,22 +91,24 @@ namespace solver
         void Update(const Move* move, bool updateEval)
         {
             --nbEmpty_;
-            const uint64_t posBit = PosToBit(move->pos_);
-            stones_.Update(posBit, move->flips_);
+            const auto& pos  = move->pos_;
+            const auto& flip = move->flips_;
+            stones_.Update(pos, flip);
             if (updateEval)
             {
-                eval_.Update(posBit, move->flips_);
+                eval_.Update(pos, flip);
             }
         }
 
         void Restore(const Move* move, bool updateEval)
         {
             ++nbEmpty_;
-            const uint64_t posBit = PosToBit(move->pos_);
-            stones_.Restore(posBit, move->flips_);
+            const auto& pos  = move->pos_;
+            const auto& flip = move->flips_;
+            stones_.Restore(pos, flip);
             if (updateEval)
             {
-                eval_.Restore(posBit, move->flips_);
+                eval_.Restore(pos, flip);
             }
         }
 

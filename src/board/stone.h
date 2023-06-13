@@ -12,9 +12,11 @@ namespace board
         uint64_t own_;
         uint64_t opp_;
 
-        void Swap();
-        void Update(uint64_t pos, uint64_t flips);
-        void Restore(uint64_t pos, uint64_t flips);
+        inline void Swap();
+        inline void Update(Position pos, uint64_t flips) { Update(PosToBit(pos), flips); }
+        inline void Update(uint64_t pos, uint64_t flips);
+        inline void Restore(Position pos, uint64_t flips) { Restore(PosToBit(pos), flips); }
+        inline void Restore(uint64_t pos, uint64_t flips);
         int GetCountDiff();
 
         uint64_t CalcFlip(const Position index) { return CalcFlip64(own_, opp_, index); }

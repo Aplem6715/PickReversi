@@ -5,7 +5,7 @@
 
 namespace eval
 {
-    class PositionEvaluator;
+    class PositionEval;
 }
 
 namespace solver
@@ -27,7 +27,7 @@ namespace game
         virtual void NotifyUndo() override {} /*なにもしない*/
 
     private:
-        solver::Searcher<eval::PositionEvaluator>* searcher_;
+        solver::Searcher<eval::PositionEval>* searcher_;
     };
 }
 

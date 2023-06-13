@@ -29,18 +29,18 @@ endfunction()
 # print_list("GLOB RELATIVE ${CMAKE_SOURCE_DIR}/src" "${SOURCE}")
     
 list(REMOVE_ITEM SOURCE "bench/benchmark.cpp")
-list(REMOVE_ITEM SOURCE "Solver/train/selfplay.cpp")
+list(REMOVE_ITEM SOURCE "Solver/train/train.cpp")
 # ソースをこのプロジェクトの実行可能ファイルに追加します。
 add_executable(PickReversi ${SOURCE})
 # target_link_libraries(PickReversi PRIVATE spdlog::spdlog)
 
 list(REMOVE_ITEM SOURCE "main.cpp")
 
-# list(APPEND SOURCE "Solver/train/selfplay.cpp")
-# add_executable(train ${SOURCE})
-# target_compile_definitions(train PRIVATE LEARN_MODE)
+list(APPEND SOURCE "Solver/train/train.cpp")
+add_executable(train ${SOURCE})
+target_compile_definitions(train PRIVATE TRAIN_BUILD)
 
-list(REMOVE_ITEM SOURCE "Solver/train/selfplay.cpp")
+list(REMOVE_ITEM SOURCE "Solver/train/train.cpp")
 list(APPEND SOURCE "Bench/benchmark.cpp")
 add_executable(bench ${SOURCE})
 target_compile_definitions(bench PRIVATE ENABLE_PROFILE)

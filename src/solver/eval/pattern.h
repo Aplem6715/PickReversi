@@ -1,6 +1,8 @@
 ﻿#ifndef PATTERN_H
 #define PATTERN_H
 
+#include "const.h"
+#include <array>
 #include <cstdint>
 
 namespace eval
@@ -34,7 +36,8 @@ namespace eval
     constexpr int kShapeCorner = 9;
     constexpr int kShapeArrow  = 10;
     constexpr int kShapeMiddle = 11;
-    constexpr int kShapeNum    = 12;
+    constexpr int kShapeNumMob = 12;
+    constexpr int kShapeNum    = 13;
 
     // 3^9 x 4 = 78,732
     constexpr int kPatternLine2_1 = 0; // 3^9
@@ -106,28 +109,32 @@ namespace eval
     constexpr int kPatternMidle_3 = 44;
     constexpr int kPatternMidle_4 = 45;
 
-    constexpr int kPatternNum = 46;
+    // 33(着手可能最大数)
+    constexpr int kPatternMobil = 46;
 
-    constexpr uint16_t kPow3[] = {POW3_0, POW3_1, POW3_2, POW3_3,
-                                  POW3_4, POW3_5, POW3_6, POW3_7,
-                                  POW3_8, POW3_9, POW3_10};
+    constexpr int kPatternNum = 47;
+
+    constexpr uint16_t kPow3[] = {kPow3_0, kPow3_1, kPow3_2, kPow3_3,
+                                  kPow3_4, kPow3_5, kPow3_6, kPow3_7,
+                                  kPow3_8, kPow3_9, kPow3_10};
 
     constexpr uint8_t PatternId2Type[kPatternNum] = {
-        0, 0, 0, 0,     // LINE2
-        1, 1, 1, 1,     // LINE3
-        2, 2, 2, 2,     // LINE4
-        3, 3, 3, 3,     // DIAG4
-        4, 4, 4, 4,     // DIAG5
-        5, 5, 5, 5,     // DIAG6
-        6, 6, 6, 6,     // DIAG7
-        7, 7,           // DIAG8
-        8, 8, 8, 8,     // EDGE
-        9, 9, 9, 9,     // CORNER
-        10, 10, 10, 10, // ARROW
-        10, 10, 10, 10, // MIDDLE
+        kShapeLine2, kShapeLine2, kShapeLine2, kShapeLine2,     // LINE2
+        kShapeLine3, kShapeLine3, kShapeLine3, kShapeLine3,     // LINE3
+        kShapeLine4, kShapeLine4, kShapeLine4, kShapeLine4,     // LINE4
+        kShapeDiag4, kShapeDiag4, kShapeDiag4, kShapeDiag4,     // DIAG4
+        kShapeDiag5, kShapeDiag5, kShapeDiag5, kShapeDiag5,     // DIAG5
+        kShapeDiag6, kShapeDiag6, kShapeDiag6, kShapeDiag6,     // DIAG6
+        kShapeDiag7, kShapeDiag7, kShapeDiag7, kShapeDiag7,     // DIAG7
+        kShapeDiag8, kShapeDiag8,                               // DIAG8
+        kShapeEdge, kShapeEdge, kShapeEdge, kShapeEdge,         // EDGE
+        kShapeCorner, kShapeCorner, kShapeCorner, kShapeCorner, // CORNER
+        kShapeArrow, kShapeArrow, kShapeArrow, kShapeArrow,     // ARROW
+        kShapeMiddle, kShapeMiddle, kShapeMiddle, kShapeMiddle, // MIDDLE
+        kShapeNumMob,                                           // Mobility
     };
 
-    constexpr uint32_t kPatternIndexMax[kShapeNum] = {
+    constexpr std::array<uint32_t, kShapeNum> kPatternIndexMax = {
         kPow3_8,  // LINE2
         kPow3_8,  // LINE3
         kPow3_8,  // LINE4
@@ -140,24 +147,55 @@ namespace eval
         kPow3_9,  // CORNER
         kPow3_10, // ARROW
         kPow3_10, // MIDDLE
+        kMaxMove, // Mobility(0~33)
     };
 
-    constexpr uint32_t kPatternOffset[] = {
-        0, 0, 0, 0,
-        kPatternIndexMax[0], kPatternIndexMax[0], kPatternIndexMax[0], kPatternIndexMax[0],     // LINE2
-        kPatternIndexMax[1], kPatternIndexMax[1], kPatternIndexMax[1], kPatternIndexMax[1],     // LINE3
-        kPatternIndexMax[2], kPatternIndexMax[2], kPatternIndexMax[2], kPatternIndexMax[2],     // DIAG4
-        kPatternIndexMax[3], kPatternIndexMax[3], kPatternIndexMax[3], kPatternIndexMax[3],     // DIAG5
-        kPatternIndexMax[4], kPatternIndexMax[4], kPatternIndexMax[4], kPatternIndexMax[4],     // DIAG6
-        kPatternIndexMax[5], kPatternIndexMax[5], kPatternIndexMax[5], kPatternIndexMax[5],     // DIAG7
-        kPatternIndexMax[6], kPatternIndexMax[6],                                               // DIAG8
-        kPatternIndexMax[7], kPatternIndexMax[7], kPatternIndexMax[7], kPatternIndexMax[7],     // EDGE
-        kPatternIndexMax[8], kPatternIndexMax[8], kPatternIndexMax[8], kPatternIndexMax[8],     // CORNER
-        kPatternIndexMax[9], kPatternIndexMax[9], kPatternIndexMax[9], kPatternIndexMax[9],     // ARROW
-        kPatternIndexMax[10], kPatternIndexMax[10], kPatternIndexMax[10], kPatternIndexMax[10], // MIDDLE
-    };
+    // 累積計算
+    constexpr std::array<uint32_t, kShapeNum> MakePatternHeadArray()
+    {
+        std::array<uint32_t, kShapeNum> ret = {0};
 
-    inline int Phase(int nbEmpty) { return nbEmpty / kNumPut1Phase; }
+        uint32_t prev = 0;
+        for (int p = 0; p < kShapeNum; ++p)
+        {
+            ret[p] = prev;
+            prev   = prev + kPatternIndexMax[p];
+        }
+        return ret;
+    }
+
+    // 各パターンの先頭(0)のインデックス（kPatternIndexMaxを累積したもの）
+    constexpr std::array<uint32_t, kShapeNum> kPatternIndexHead = MakePatternHeadArray();
+
+    constexpr uint32_t CalcNumWeight()
+    {
+        uint32_t ret = 0;
+        for (const auto max : kPatternIndexMax)
+        {
+            ret += max;
+        }
+        return ret;
+    }
+
+    constexpr std::array<uint32_t, kPatternNum> MakePatternOffset()
+    {
+        std::array<uint32_t, kPatternNum> ret = {0};
+        for (int pid = 0; pid < kPatternNum; ++pid)
+        {
+            ret[pid] = kPatternIndexHead[PatternId2Type[pid]];
+        }
+        return ret;
+    }
+
+    constexpr uint32_t kNumWeight = CalcNumWeight();
+
+    constexpr std::array<uint32_t, kPatternNum> kPatternOffset = MakePatternOffset();
+
+    inline int
+    Phase(int nbEmpty)
+    {
+        return nbEmpty / kNumPut1Phase;
+    }
 
     /**
      * テスト済み

@@ -32,7 +32,8 @@ namespace eval
         unsigned int state_[kPatternNum];
 
         // weight[side][phase][state[patternId]]
-        short *weight_[2][kNumPhase];
+        // キャッシュに乗るようにまとめてalloc
+        short ***weight_;
 
         Side side_;
 
@@ -40,6 +41,11 @@ namespace eval
         inline void PutOpp(Position pos);
         inline void FlipOwn(Position pos);
         inline void FlipOpp(Position pos);
+
+#if TRAIN_BUILD
+    friend class PatternTrainer;
+#endif // TRAIN_BUILD
+
     };
 }
 

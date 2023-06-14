@@ -7,9 +7,6 @@
 
 namespace eval
 {
-    constexpr int kNumPhase     = 15;
-    constexpr int kNumPut1Phase = 60 / kNumPhase;
-
     constexpr int kPow0_0  = 0;
     constexpr int kPow3_0  = 1;
     constexpr int kPow3_1  = 3;
@@ -191,31 +188,27 @@ namespace eval
 
     constexpr std::array<uint32_t, kPatternNum> kPatternOffset = MakePatternOffset();
 
-    inline int
-    Phase(int nbEmpty)
-    {
-        return nbEmpty / kNumPut1Phase;
-    }
-
     template <typename T>
     inline T*** AllocPatternWeight()
     {
         // weightのメモリ確保．
         // キャッシュに乗るようにまとめて確保する
-        // (本体は [weight_[0][0] = ...] の行)
-        T*** weight_ = new T**[2];
+        // (本体は [weight[0][0] = ...] の行)
+        T*** weight = new T**[2];
 
-        weight_[0] = new T*[2 * kNumPhase];
-        weight_[1] = weight_[0] + kNumPhase;
+        weight[0] = new T*[2 * kNumPhase];
+        weight[1] = weight[0] + kNumPhase;
 
-        weight_[0][0] = new T[2 * kNumPhase * kNumWeight];
-        weight_[1][0] = weight_[0][0] + kNumPhase * kNumWeight;
+        weight[0][0] = new T[2 * kNumPhase * kNumWeight];
+        weight[1][0] = weight[0][0] + kNumPhase * kNumWeight;
 
         for (int phase = 1; phase < kNumPhase; ++phase)
         {
-            weight_[0][phase] = weight_[0][phase - 1] + kNumWeight;
-            weight_[1][phase] = weight_[1][phase - 1] + kNumWeight;
+            weight[0][phase] = weight[0][phase - 1] + kNumWeight;
+            weight[1][phase] = weight[1][phase - 1] + kNumWeight;
         }
+
+        return weight;
     }
 
     template <typename T>

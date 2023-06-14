@@ -10,7 +10,7 @@ namespace eval
     class PositionEval
     {
     public:
-        score32_t Evaluate(int nEmpty);
+        score32_t Evaluate(int phase);
 
         void Reload(stone_t own, stone_t opp);
         void Update(Position pos, stone_t flips);

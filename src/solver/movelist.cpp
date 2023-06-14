@@ -99,7 +99,7 @@ namespace solver
             // 一手読みのスコア付け（16~8bit目)
             // 着手して相手のターンに進める
             eval.Update(pos, flips);
-            const score32_t score = eval.Evaluate(searcher.GetNumEmpty() - 1);
+            const score32_t score = eval.Evaluate(Phase(searcher.GetNumEmpty() - 1));
             eval.Restore(pos, flips);
             value -= score * (1 << kOneStepScoreOrder);
 

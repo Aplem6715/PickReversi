@@ -4,6 +4,14 @@
 #include "evaluator.h"
 #include "pattern.h"
 #include "pos2pattern.h"
+#include <array>
+
+#if TRAIN_BUILD
+namespace train
+{
+    class PatternTrainer;
+}
+#endif
 
 namespace eval
 {
@@ -29,7 +37,7 @@ namespace eval
     private:
         // 各パターンのステート（石の状態）
         // ステートはパターンに応じてシフト済み
-        unsigned int state_[kPatternNum];
+        std::array<int, kPatternNum> state_;
 
         // weight[side][phase][state[patternId]]
         // キャッシュに乗るようにまとめてalloc
@@ -43,7 +51,7 @@ namespace eval
         inline void FlipOpp(Position pos);
 
 #if TRAIN_BUILD
-        friend class PatternTrainer;
+        friend class train::PatternTrainer;
 #endif // TRAIN_BUILD
     };
 }

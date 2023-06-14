@@ -18,7 +18,7 @@ namespace eval
     };
     // clang-format on
 
-    score32_t PositionEval::Evaluate(int nEmpty)
+    score32_t PositionEval::Evaluate(int phase)
     {
         score32_t score     = 0;
         const stone_t own = _own;

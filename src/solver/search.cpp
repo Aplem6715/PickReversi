@@ -242,7 +242,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return eval_.Evaluate(nbEmpty_);
+            return eval_.Evaluate(Phase(nbEmpty_));
         }
 
         PROFILE(++prof_.nodeCount);
@@ -288,7 +288,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return eval_.Evaluate(nbEmpty_);
+            return eval_.Evaluate(Phase(nbEmpty_));
         }
 
         PROFILE(++prof_.nodeCount);

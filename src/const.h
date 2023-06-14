@@ -24,6 +24,14 @@ constexpr int kEvalInvalid = -127;
 // 参考：https://eukaryote.hateblo.jp/entry/2023/05/17/163629
 constexpr int kMaxMove = 33;
 
+constexpr int kNumPhase     = 15;
+constexpr int kNumPut1Phase = 60 / kNumPhase;
+
+constexpr int Phase(int nbEmpty)
+{
+    return nbEmpty / kNumPut1Phase;
+}
+
 enum class Side : uint8_t
 {
     Own,

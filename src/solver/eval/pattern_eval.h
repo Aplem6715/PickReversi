@@ -33,7 +33,7 @@ namespace eval
 
         // weight[side][phase][state[patternId]]
         // キャッシュに乗るようにまとめてalloc
-        short ***weight_;
+        short*** weight_;
 
         Side side_;
 
@@ -43,9 +43,8 @@ namespace eval
         inline void FlipOpp(Position pos);
 
 #if TRAIN_BUILD
-    friend class PatternTrainer;
+        friend class PatternTrainer;
 #endif // TRAIN_BUILD
-
     };
 }
 

@@ -22,7 +22,7 @@ namespace eval
         PatternEval(const std::string& path);
         ~PatternEval();
 
-        score32_t Evaluate(int nEmpty);
+        score_t Evaluate(int phase);
 
         void Reload(stone_t own, stone_t opp);
         void ResetState();

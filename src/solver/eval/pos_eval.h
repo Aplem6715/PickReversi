@@ -5,12 +5,12 @@
 
 namespace eval
 {
-    extern const score32_t ValueTable[64];
+    extern const score_t ValueTable[64];
 
     class PositionEval
     {
     public:
-        score32_t Evaluate(int phase);
+        score_t Evaluate(int phase);
 
         void Reload(stone_t own, stone_t opp);
         void Update(Position pos, stone_t flips);

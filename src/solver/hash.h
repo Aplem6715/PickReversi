@@ -26,7 +26,7 @@ namespace solver
         /// @param version 探索バージョン（手番のたびに+1）
         /// @param cost 探索コスト（log2）
         /// @param depth 深度
-        inline void Rewrite(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth);
+        inline void Rewrite(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth);
 
         /// @brief データを更新
         /// @param upper 評価値上限
@@ -36,7 +36,7 @@ namespace solver
         /// @param version 探索バージョン（手番のたびに+1）
         /// @param cost 探索コスト（log2）
         /// @param depth 深度
-        inline void Update(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth);
+        inline void Update(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth);
 
         /// @brief データ優先度を取得
         inline uint32_t GetPriority() const;
@@ -47,7 +47,7 @@ namespace solver
         /// @param lower 評価値下限
         /// @param score 評価値
         /// @param move 見つかった最善手
-        inline void Update(score32_t upper, score32_t lower, score32_t score, Position move);
+        inline void Update(score_t upper, score_t lower, score_t score, Position move);
 
         /// @brief 深度を更新
         /// @param upper 評価値上限
@@ -55,7 +55,7 @@ namespace solver
         /// @param score 評価値
         /// @param move 見つかった最善手
         /// @param depth 新しい深度
-        inline void Deepen(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t depth);
+        inline void Deepen(score_t upper, score_t lower, score_t score, Position move, uint8_t depth);
     };
 
     constexpr HashData kInitHashData = {
@@ -74,7 +74,7 @@ namespace solver
         HashData value_;
     };
 
-    void HashData::Update(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
+    void HashData::Update(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
     {
         if (depth_ == depth)
         {
@@ -98,7 +98,7 @@ namespace solver
         return (static_cast<uint32_t>(usedVer_) << 16) + (static_cast<uint32_t>(cost_) << 8) + depth_;
     }
 
-    void HashData::Rewrite(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
+    void HashData::Rewrite(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
     {
         this->upper_ = score < upper ? score : kEvalMax;
         this->lower_ = score > lower ? score : kEvalMin;
@@ -112,7 +112,7 @@ namespace solver
         this->depth_   = depth;
     }
 
-    void HashData::Update(score32_t upper, score32_t lower, score32_t score, Position move)
+    void HashData::Update(score_t upper, score_t lower, score_t score, Position move)
     {
         if (score < upper && score < this->upper_)
             this->upper_ = score;
@@ -125,7 +125,7 @@ namespace solver
         }
     }
 
-    void HashData::Deepen(score32_t upper, score32_t lower, score32_t score, Position move, uint8_t depth)
+    void HashData::Deepen(score_t upper, score_t lower, score_t score, Position move, uint8_t depth)
     {
         this->upper_ = score < upper ? score : kEvalMax;
         this->lower_ = score > lower ? score : kEvalMin;

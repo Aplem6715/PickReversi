@@ -21,9 +21,9 @@ namespace solver
         bool TryGetValue(const board::Stone& stones, uint64_t hashCode, HashData* data);
         void Add(const board::Stone& stones,
                  uint64_t hashCode,
-                 score32_t upper,
-                 score32_t lower,
-                 score32_t score,
+                 score_t upper,
+                 score_t lower,
+                 score_t score,
                  Position move,
                  uint8_t cost,
                  uint8_t depth);

@@ -6,7 +6,7 @@ namespace eval
 {
 
     // clang-format off
-    extern const score32_t ValueTable[64] = {
+    extern const score_t ValueTable[64] = {
          30, -12,   0,  -1,  -1,   0, -12,  30,
         -12, -15,  -3,  -3,  -3,  -3, -15, -12,
           0,  -3,   0,  -1,  -1,   0,  -3,   0,
@@ -18,9 +18,9 @@ namespace eval
     };
     // clang-format on
 
-    score32_t PositionEval::Evaluate(int phase)
+    score_t PositionEval::Evaluate(int phase)
     {
-        score32_t score     = 0;
+        score_t score     = 0;
         const stone_t own = _own;
         const stone_t opp = _opp;
         for (int i = 0; i < kBoardSize * kBoardSize; i++)

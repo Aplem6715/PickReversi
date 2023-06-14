@@ -20,7 +20,7 @@ namespace solver
     /// @param upper 上限値
     /// @param score スコア
     /// @return カットされるならtrue
-    inline bool ApplyHashRange(const HashData& hashData, const int depth, score32_t* lower, score32_t* upper, score32_t* score)
+    inline bool ApplyHashRange(const HashData& hashData, const int depth, score_t* lower, score_t* upper, score_t* score)
     {
         assert(hashData.lower_ <= hashData.upper_);
 
@@ -42,8 +42,8 @@ namespace solver
                 return true;
             }
 
-            *lower = std::max(*lower, static_cast<score32_t>(hashData.lower_));
-            *upper = std::min(*upper, static_cast<score32_t>(hashData.upper_));
+            *lower = std::max(*lower, static_cast<score_t>(hashData.lower_));
+            *upper = std::min(*upper, static_cast<score_t>(hashData.upper_));
         }
 
         return false;
@@ -164,11 +164,11 @@ namespace solver
     template <class Evaluator>
     void Searcher<Evaluator>::MidRoot(SearchResult* result)
     {
-        score32_t lower     = kEvalMin - 1;
-        score32_t upper     = kEvalMax + 1;
-        score32_t bestScore = kEvalInvalid;
+        score_t lower     = kEvalMin - 1;
+        score_t upper     = kEvalMax + 1;
+        score_t bestScore = kEvalInvalid;
         Position bestMove   = Position::NoMove;
-        score32_t score;
+        score_t score;
         int depth = option_.midDepth_;
 
         if (!wasMidSearch_)
@@ -237,7 +237,7 @@ namespace solver
     }
 
     template <class Evaluator>
-    score32_t Searcher<Evaluator>::MidMinMax(int depth, bool passed)
+    score_t Searcher<Evaluator>::MidMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -246,7 +246,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score32_t bestScore = kEvalInvalid;
+        score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -269,7 +269,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -MidMinMax(depth - 1, false);
+                const score_t score = -MidMinMax(depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -283,7 +283,7 @@ namespace solver
     }
 
     template <class Evaluator>
-    score32_t Searcher<Evaluator>::MidAlphaBeta(const score32_t upLimit, const score32_t lowLimit, const int depth, const bool passed)
+    score_t Searcher<Evaluator>::MidAlphaBeta(const score_t upLimit, const score_t lowLimit, const int depth, const bool passed)
     {
         if (depth == 0)
         {
@@ -293,8 +293,8 @@ namespace solver
 
         PROFILE(++prof_.nodeCount);
 
-        score32_t lower = lowLimit;
-        score32_t upper = upLimit;
+        score_t lower = lowLimit;
+        score_t upper = upLimit;
 
         /* Hash Cut */
         HashData hashData;
@@ -303,7 +303,7 @@ namespace solver
         {
             if (table_->TryGetValue(stones_, hashCode, &hashData))
             {
-                score32_t score;
+                score_t score;
                 if (ApplyHashRange(hashData, depth, &lower, &upper, &score))
                 {
                     return score;
@@ -315,7 +315,7 @@ namespace solver
             hashData = kInitHashData;
         }
 
-        score32_t bestScore = kEvalInvalid;
+        score_t bestScore = kEvalInvalid;
         Position bestMove   = Position::NoMove;
         MoveList moveList[1];
         MakeMoveList(moveList);
@@ -343,7 +343,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -MidAlphaBeta(-lower, -upper, depth - 1, false);
+                const score_t score = -MidAlphaBeta(-lower, -upper, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -376,11 +376,11 @@ namespace solver
     template <class Evaluator>
     void Searcher<Evaluator>::EndRoot(SearchResult* result)
     {
-        score32_t lower     = kEvalMin - 1;
-        score32_t upper     = kEvalMax + 1;
-        score32_t bestScore = kEvalInvalid;
+        score_t lower     = kEvalMin - 1;
+        score_t upper     = kEvalMax + 1;
+        score_t bestScore = kEvalInvalid;
         Position bestMove   = Position::NoMove;
-        score32_t score;
+        score_t score;
         int depth = nbEmpty_;
 
         if (wasMidSearch_)
@@ -448,7 +448,7 @@ namespace solver
     }
 
     template <class Evaluator>
-    score32_t Searcher<Evaluator>::EndMinMax(int depth, bool passed)
+    score_t Searcher<Evaluator>::EndMinMax(int depth, bool passed)
     {
         if (depth == 0)
         {
@@ -457,7 +457,7 @@ namespace solver
         }
 
         PROFILE(++prof_.nodeCount);
-        score32_t bestScore = kEvalInvalid;
+        score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
 
         MakeMoveList(moveList);
@@ -480,7 +480,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -EndMinMax(depth - 1, false);
+                const score_t score = -EndMinMax(depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -494,7 +494,7 @@ namespace solver
     }
 
     template <class Evaluator>
-    score32_t Searcher<Evaluator>::EndAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed)
+    score_t Searcher<Evaluator>::EndAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed)
     {
         if (depth == 0)
         {
@@ -503,8 +503,8 @@ namespace solver
         }
         PROFILE(++prof_.nodeCount);
 
-        score32_t lower   = low_limit;
-        score32_t upper   = up_limit;
+        score_t lower   = low_limit;
+        score_t upper   = up_limit;
         Position bestMove = Position::NoMove;
 
         HashData hashData;
@@ -513,7 +513,7 @@ namespace solver
         {
             if (table_->TryGetValue(stones_, hashCode, &hashData))
             {
-                score32_t score;
+                score_t score;
                 if (ApplyHashRange(hashData, depth, &lower, &upper, &score))
                 {
                     return score;
@@ -525,7 +525,7 @@ namespace solver
             hashData = kInitHashData;
         }
 
-        score32_t bestScore = kEvalInvalid;
+        score_t bestScore = kEvalInvalid;
         MoveList moveList[1];
         MakeMoveList(moveList);
 
@@ -552,7 +552,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score32_t score = -EndAlphaBeta(-lower, -upper, depth - 1, false);
+                const score_t score = -EndAlphaBeta(-lower, -upper, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)

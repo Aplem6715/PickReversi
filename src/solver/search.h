@@ -71,20 +71,20 @@ namespace solver
         void MidRoot(SearchResult* result);
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score32_t MidMinMax(int depth, bool passed);
+        score_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
-        score32_t MidAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed);
+        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score32_t EndMinMax(int depth, bool passed);
+        score_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
-        score32_t EndAlphaBeta(const score32_t upper, const score32_t lower, const int depth, const bool passed);
+        score_t EndAlphaBeta(const score_t upper, const score_t lower, const int depth, const bool passed);
 
         /* 探索中に使用するinline関数 */
 
@@ -118,7 +118,7 @@ namespace solver
             eval_.UpdatePass();
         }
 
-        score32_t WinJudge()
+        score_t WinJudge()
         {
             auto diff = stones_.GetCountDiff();
             if (diff > 0)
@@ -135,7 +135,7 @@ namespace solver
             }
         }
 
-        score32_t WinJudgeEnd()
+        score_t WinJudgeEnd()
         {
             auto diff = stones_.GetCountDiff();
             // 空きマスは勝った方に加算される

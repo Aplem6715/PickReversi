@@ -129,7 +129,7 @@ namespace solver
         return false;
     }
 
-    void HashTable::Add(const board::Stone& stones, uint64_t hashCode, score32_t upper, score32_t lower, score32_t score, Position move, uint8_t cost, uint8_t depth)
+    void HashTable::Add(const board::Stone& stones, uint64_t hashCode, score_t upper, score_t lower, score_t score, Position move, uint8_t cost, uint8_t depth)
     {
         uint64_t index = hashCode & mask_;
 

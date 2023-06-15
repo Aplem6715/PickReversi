@@ -115,7 +115,7 @@ namespace eval
                                   kPow3_4, kPow3_5, kPow3_6, kPow3_7,
                                   kPow3_8, kPow3_9, kPow3_10};
 
-    constexpr uint8_t PatternId2Type[kPatternNum] = {
+    constexpr uint8_t kPattern2Shape[kPatternNum] = {
         kShapeLine2, kShapeLine2, kShapeLine2, kShapeLine2,     // LINE2
         kShapeLine3, kShapeLine3, kShapeLine3, kShapeLine3,     // LINE3
         kShapeLine4, kShapeLine4, kShapeLine4, kShapeLine4,     // LINE4
@@ -131,7 +131,9 @@ namespace eval
         kShapeNumMob,                                           // Mobility
     };
 
-    constexpr std::array<uint32_t, kShapeNum> kPatternIndexMax = {
+    constexpr std::array<int, kShapeNum> kShapeDigits = {8, 8, 8, 4, 5, 6, 7, 8, 10, 9, 10, 10, 0};
+
+    constexpr std::array<uint32_t, kShapeNum> kShapeIndexMax = {
         kPow3_8,  // LINE2
         kPow3_8,  // LINE3
         kPow3_8,  // LINE4
@@ -156,7 +158,7 @@ namespace eval
         for (int p = 0; p < kShapeNum; ++p)
         {
             ret[p] = prev;
-            prev   = prev + kPatternIndexMax[p];
+            prev   = prev + kShapeIndexMax[p];
         }
         return ret;
     }
@@ -167,7 +169,7 @@ namespace eval
     constexpr uint32_t CalcNumWeight()
     {
         uint32_t ret = 0;
-        for (const auto max : kPatternIndexMax)
+        for (const auto max : kShapeIndexMax)
         {
             ret += max;
         }
@@ -179,14 +181,20 @@ namespace eval
         std::array<uint32_t, kPatternNum> ret = {0};
         for (int pid = 0; pid < kPatternNum; ++pid)
         {
-            ret[pid] = kPatternIndexHead[PatternId2Type[pid]];
+            ret[pid] = kPatternIndexHead[kPattern2Shape[pid]];
         }
         return ret;
     }
 
-    constexpr uint32_t kNumWeight = CalcNumWeight();
+    constexpr uint32_t kNumWeight    = CalcNumWeight();
+    constexpr size_t kWeightDataSize = 2 * kNumPhase * kNumWeight;
 
     constexpr std::array<uint32_t, kPatternNum> kPatternOffset = MakePatternOffset();
+
+    inline int ReverseOffset(int patternId, int state)
+    {
+        return state - kPatternOffset[patternId];
+    }
 
     template <typename T>
     inline T*** AllocPatternWeight()
@@ -217,27 +225,6 @@ namespace eval
         delete[] weight[0][0];
         delete[] weight[0];
         delete[] weight;
-    }
-
-    /**
-     * テスト済み
-     * @brief 敵味方逆のパターンインデックスを取得する
-     *
-     * @param idx インデックス
-     * @param digit インデックスの３進桁数
-     * @return uint16 逆立場のインデックス
-     */
-    inline uint16_t OpponentIndex(uint16_t idx, uint8_t digit)
-    {
-        const uint16_t oppN[] = {0, 2, 1};
-        uint16_t ret          = 0;
-        uint8_t shift;
-        for (shift = 0; shift < digit; shift++)
-        {
-            ret += oppN[idx % 3] * kPow3[shift];
-            idx /= 3;
-        }
-        return ret;
     }
 }
 

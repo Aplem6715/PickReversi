@@ -62,10 +62,13 @@ namespace train
     class PatternTrainer
     {
     public:
-        PatternTrainer();
+        PatternTrainer(PatternEval* eval);
         ~PatternTrainer();
 
         void Train(const Batch& batchData, int phase);
+
+        bool SaveCheckpoint(const std::string& path);
+        bool LoadCheckpoint(const std::string& path);
 
     private:
         PatternEval* eval_;
@@ -74,6 +77,8 @@ namespace train
         TrainWeight*** trainWeights_;
 
         void Train(const std::array<int, kPatternNum> states, int phase, int diff);
+        void ApplyWeight();
+        void ShareWeight(short* target);
     };
 
 }

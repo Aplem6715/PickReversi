@@ -7,16 +7,17 @@ namespace eval
 {
     struct PosToPattern
     {
-        int numPattern;
+        uint16_t numPattern;
         struct
         {
-            unsigned short uid;
-            unsigned short idx;
-        } pattern[8];
+            uint16_t uid;
+            uint16_t idx;
+        } pattern[7];
     };
 
     // clang-format off
-    // 各座標と対応するパターンとその３進インデックス
+
+    // 各座標と対応するパターンとその3進インデックス
     static const PosToPattern kPos2Pattern[] = {
         /*A1*/ {6, {{kPatternDiag8_2, kPow3_0}, {kPatternEdgeX_1, kPow3_1}, {kPatternEdgeX_4, kPow3_8}, {kPatternConer_1, kPow3_0}, {kPatternArrow_1, kPow3_4}, {kPatternMidle_1, kPow3_0}, {kPatternMidle_4, kPow3_9}}},
         /*B1*/ {6, {{kPatternLine2_4, kPow3_0}, {kPatternDiag7_2, kPow3_0}, {kPatternEdgeX_1, kPow3_2}, {kPatternConer_1, kPow3_1}, {kPatternArrow_1, kPow3_6}}},
@@ -90,7 +91,7 @@ namespace eval
         /*G8*/ {6, {{kPatternLine2_2, kPow3_7}, {kPatternDiag7_4, kPow3_6}, {kPatternEdgeX_3, kPow3_2}, {kPatternConer_3, kPow3_1}, {kPatternArrow_3, kPow3_6}}},
         /*H8*/ {6, {{kPatternDiag8_2, kPow3_7}, {kPatternEdgeX_2, kPow3_8}, {kPatternEdgeX_3, kPow3_1}, {kPatternConer_3, kPow3_0}, {kPatternArrow_3, kPow3_4}, {kPatternMidle_3, kPow3_0}, {kPatternMidle_2, kPow3_9}}},
     };
-
     // clang-format on
+
 }
 #endif

@@ -453,7 +453,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return stones_.GetCountDiff() * kEvalStone;
+            return stones_.GetCountDiff();
         }
 
         PROFILE(++prof_.nodeCount);
@@ -466,7 +466,7 @@ namespace solver
         {
             if (passed)
             {
-                return stones_.GetCountDiff() * kEvalStone;
+                return stones_.GetCountDiff();
             }
             else
             {
@@ -499,7 +499,7 @@ namespace solver
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
-            return stones_.GetCountDiff() * kEvalStone;
+            return stones_.GetCountDiff();
         }
         PROFILE(++prof_.nodeCount);
 
@@ -533,7 +533,7 @@ namespace solver
         {
             if (passed)
             {
-                return stones_.GetCountDiff() * kEvalStone;
+                return stones_.GetCountDiff();
             }
             else
             {

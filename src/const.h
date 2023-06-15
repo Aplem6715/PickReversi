@@ -13,11 +13,15 @@ const std::string kBlackIcon   = "#";
 const std::string kWhiteIcon   = "o";
 const std::string kInvalidIcon = "Err";
 
-/// 1石あたりの評価値
-constexpr int kEvalStone   = 1;
-constexpr int kEvalMax     = kEvalStone * 64;
-constexpr int kEvalMin     = -kEvalMax;
-constexpr int kEvalInvalid = -127;
+/// 1石あたりのWeight
+/// (int16の最大値32767 / 64 = 511.9 より256を選択．よって最大石差64のとき256 * 64 = 16384)
+constexpr int16_t kWeightOneStone   = 256;
+
+// 評価値定数
+constexpr score_t kEvalMax     = 64;
+constexpr score_t kEvalMin     = -kEvalMax;
+constexpr score_t kEvalLimit   = 120;
+constexpr score_t kEvalInvalid = -127;
 
 // 1盤面における最大着手可能位置数
 // 棋譜：f5f6e6f4g7c6g3e7d6f3e3d3b7d7c2g2g1c3b2b3b4f7g5c4c7c8e2

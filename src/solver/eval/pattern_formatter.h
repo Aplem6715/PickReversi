@@ -170,6 +170,8 @@ namespace eval
 
     inline int GetFlipPattern(int patternId, int state)
     {
+        if (patternId == kPatternMobil)
+            return state;
         const int shape = kPattern2Shape[patternId];
         const int digit = kShapeDigits[shape];
         const int rev   = ReverseOffset(patternId, state);

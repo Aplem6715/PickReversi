@@ -4,6 +4,7 @@
 !resource/test
 build/*
 !build/.bitkeep
+VC.*
 
 # Prerequisites
 *.d

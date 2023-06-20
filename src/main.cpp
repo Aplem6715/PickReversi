@@ -1,4 +1,7 @@
-﻿#include "game/game.h"
+﻿
+#ifndef TRAIN_BUILD
+
+#include "game/game.h"
 #include "game/record.h"
 #include <iostream>
 #include <stdio.h>
@@ -14,3 +17,5 @@ int main()
 
     return 0;
 }
+
+#endif

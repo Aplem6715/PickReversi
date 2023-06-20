@@ -3,6 +3,7 @@
 
 #include "const.h"
 #include <array>
+#include <cassert>
 #include <cstdint>
 
 namespace eval
@@ -33,8 +34,7 @@ namespace eval
     constexpr int kShapeCorner = 9;
     constexpr int kShapeArrow  = 10;
     constexpr int kShapeMiddle = 11;
-    constexpr int kShapeNumMob = 12;
-    constexpr int kShapeNum    = 13;
+    constexpr int kShapeNum    = 12;
 
     // 3^9 x 4 = 78,732
     constexpr int kPatternLine2_1 = 0; // 3^9
@@ -106,14 +106,11 @@ namespace eval
     constexpr int kPatternMidle_3 = 44;
     constexpr int kPatternMidle_4 = 45;
 
-    // 33(着手可能最大数)
-    constexpr int kPatternMobil = 46;
+    constexpr int kPatternNum = 46;
 
-    constexpr int kPatternNum = 47;
-
-    constexpr uint16_t kPow3[] = {kPow3_0, kPow3_1, kPow3_2, kPow3_3,
-                                  kPow3_4, kPow3_5, kPow3_6, kPow3_7,
-                                  kPow3_8, kPow3_9, kPow3_10};
+    constexpr int kPow3[] = {kPow3_0, kPow3_1, kPow3_2, kPow3_3,
+                             kPow3_4, kPow3_5, kPow3_6, kPow3_7,
+                             kPow3_8, kPow3_9, kPow3_10};
 
     constexpr uint8_t kPattern2Shape[kPatternNum] = {
         kShapeLine2, kShapeLine2, kShapeLine2, kShapeLine2,     // LINE2
@@ -128,10 +125,9 @@ namespace eval
         kShapeCorner, kShapeCorner, kShapeCorner, kShapeCorner, // CORNER
         kShapeArrow, kShapeArrow, kShapeArrow, kShapeArrow,     // ARROW
         kShapeMiddle, kShapeMiddle, kShapeMiddle, kShapeMiddle, // MIDDLE
-        kShapeNumMob,                                           // Mobility
     };
 
-    constexpr std::array<int, kShapeNum> kShapeDigits = {8, 8, 8, 4, 5, 6, 7, 8, 10, 9, 10, 10, 0};
+    constexpr std::array<int, kShapeNum> kShapeDigits = {8, 8, 8, 4, 5, 6, 7, 8, 10, 9, 10, 10};
 
     constexpr std::array<uint32_t, kShapeNum> kShapeIndexMax = {
         kPow3_8,  // LINE2
@@ -146,7 +142,6 @@ namespace eval
         kPow3_9,  // CORNER
         kPow3_10, // ARROW
         kPow3_10, // MIDDLE
-        kMaxMove, // Mobility(0~33)
     };
 
     // 累積計算
@@ -191,8 +186,9 @@ namespace eval
 
     constexpr std::array<uint32_t, kPatternNum> kPatternOffset = MakePatternOffset();
 
-    inline int ReverseOffset(int patternId, int state)
+    constexpr int ReverseOffset(int patternId, int state)
     {
+        assert(state - kPatternOffset[patternId] >= 0);
         return state - kPatternOffset[patternId];
     }
 
@@ -225,6 +221,49 @@ namespace eval
         delete[] weight[0][0];
         delete[] weight[0];
         delete[] weight;
+    }
+
+    inline void BuildWeight(uint16_t* target)
+    {
+        constexpr int kSideOffset = kNumPhase * kNumWeight;
+
+        // 対称パターンへweightをコピー
+        for (int p = 0; p < kPatternNum; ++p)
+        {
+            int shape  = kPattern2Shape[p];
+            int offset = kPatternOffset[p];
+            for (int state = 0; state < kShapeIndexMax[shape]; state++)
+            {
+                // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
+                // 反転パターンについては評価値を±反転させる
+                int symmIndex = GetSymmetry(p, state);
+                int oppState  = GetFlipPattern(p, state);
+                int oppSymm   = GetSymmetry(p, oppState);
+
+                const int ownIndex = std::min(state, symmIndex);
+                const int oppIndex = std::min(oppState, oppSymm);
+                const int srcIndex = std::min(ownIndex, oppIndex);
+                bool isOpp         = srcIndex == oppIndex;
+
+                if (srcIndex != state)
+                {
+                    target[offset + state] = (isOpp ? -1 : 1) * target[offset + srcIndex];
+                }
+            }
+        }
+
+        // 相手にとってのweightを設定
+        for (int p = 0; p < kPatternNum; ++p)
+        {
+            int shape  = kPattern2Shape[p];
+            int offset = kPatternOffset[p];
+            for (int i = 0; i < kShapeIndexMax[shape]; i++)
+            {
+                int oppIndex = GetFlipPattern(p, i);
+
+                target[kSideOffset + offset + oppIndex] = target[offset + i];
+            }
+        }
     }
 }
 

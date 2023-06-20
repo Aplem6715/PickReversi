@@ -7,6 +7,7 @@
 #include "pos2pattern.h"
 #include <array>
 #include <cassert>
+#include <cmath>
 
 #if TRAIN_BUILD
 namespace train
@@ -24,10 +25,10 @@ namespace eval
         PatternEval(const std::string& path);
         ~PatternEval();
 
-        score_t Evaluate(int phase);
-
         void Reload(stone_t own, stone_t opp);
         void ResetState();
+
+        inline score_t Evaluate(int phase);
 
         inline void Update(const Position pos, stone_t flips);
         inline void Restore(const Position pos, stone_t flips);
@@ -43,7 +44,7 @@ namespace eval
 
         // weight[side][phase][state[patternId]]
         // キャッシュに乗るようにまとめてalloc
-        short*** weight_;
+        uint16_t*** weight_;
 
         Side side_;
 
@@ -63,6 +64,24 @@ namespace eval
         friend class train::PatternTrainer;
 #endif // TRAIN_BUILD
     };
+
+    inline score_t PatternEval::Evaluate(int phase)
+    {
+        const auto weight = weight_[static_cast<int>(side_)][phase];
+
+        int sum = 0;
+        for (const auto& s : state_)
+        {
+            sum += weight[s];
+        }
+
+        const int sign = (std::signbit(sum) ? -1 : 1);
+        // 四捨五入
+        sum += sign * kWeightOneStone / 2;
+        sum /= kWeightOneStone;
+
+        return static_cast<score_t>(std::clamp(sum, kEvalMin, kEvalMax));
+    }
 
     inline void PatternEval::Update(const Position pos, stone_t flips)
     {

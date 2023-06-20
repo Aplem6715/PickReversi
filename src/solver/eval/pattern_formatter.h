@@ -19,10 +19,10 @@ namespace eval
         return ret;
     }
 
-    constexpr uint16_t GetReverse3(uint16_t i, uint16_t width)
+    constexpr uint16_t GetReverse3(uint16_t i, int width)
     {
         uint16_t rev = 0;
-        for (uint16_t r = 0; r < width; ++r)
+        for (int r = 0; r < width; ++r)
         {
             rev *= 3;
             rev += i % 3;
@@ -31,26 +31,15 @@ namespace eval
         return rev;
     }
 
-    template <uint16_t N>
-    constexpr const std::array<uint16_t, kPow3[N]>& GetSimpleSymmetry()
+    template <int N>
+    constexpr std::array<uint16_t, kPow3[N]> GetSimpleSymmetry()
     {
-        static constexpr std::array<uint16_t, kPow3[N]> kCache = []()
+        std::array<uint16_t, kPow3[N]> ret = {0};
+        for (uint16_t i = 0; i < ret.size(); ++i)
         {
-            std::array<uint16_t, kPow3[N]> ret = {0};
-            std::array<uint16_t, kPow3[N]> rev = {0};
-            for (uint16_t i = 0; i < ret.size(); ++i)
-            {
-                if (rev[i] == 0)
-                {
-                    rev[i] = GetReverse3(i, N);
-                }
-                uint16_t r  = std::min(i, rev[i]);
-                ret[i]      = r;
-                ret[rev[i]] = r;
-            }
-            return ret;
-        }();
-        return kCache;
+            ret[i] = GetReverse3(i, N);
+        }
+        return ret;
     }
 
     template <size_t N>
@@ -67,7 +56,7 @@ namespace eval
                 reversed += bit * kPow3[reverser[order]];
                 source /= 3;
             }
-            ret[i] = std::min(i, reversed);
+            ret[i] = reversed;
         }
         return ret;
     }
@@ -100,7 +89,7 @@ namespace eval
             rev += bit4 * kPow3_5;
             rev += bit5 * kPow3_4;
 
-            ret[i] = std::min(i, rev);
+            ret[i] = rev;
         }
         return ret;
     }
@@ -129,7 +118,6 @@ namespace eval
         kSymmetryCorner.data(), kSymmetryCorner.data(), kSymmetryCorner.data(), kSymmetryCorner.data(), // CORNER
         kSymmetryArrow.data(),  kSymmetryArrow.data(),  kSymmetryArrow.data(),  kSymmetryArrow.data(),  // ARROW
         kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     // MIDDLE
-        nullptr,                                                                                        // Mobility
     };
     // clang-format on
 
@@ -141,12 +129,11 @@ namespace eval
      * @param digit インデックスの3進桁数
      * @return 逆立場のインデックス
      */
-    inline int OpponentIndex(int idx, const int digit)
+    constexpr int OpponentIndex(int idx, const int digit)
     {
-        const int oppN[] = {0, 2, 1};
-        int ret          = 0;
-        int shift;
-        for (shift = 0; shift < digit; shift++)
+        constexpr int oppN[] = {0, 2, 1};
+        int ret              = 0;
+        for (int shift = 0; shift < digit; shift++)
         {
             ret += oppN[idx % 3] * kPow3[shift];
             idx /= 3;
@@ -156,31 +143,14 @@ namespace eval
 
     inline int GetSymmetry(int patternId, int state)
     {
-        if (patternId == kPatternMobil)
-            return state;
-        return kSymmetryPattern[patternId][ReverseOffset(patternId, state)];
+        return kSymmetryPattern[patternId][state];
     }
 
-    inline void UnifySymmetry(int patternId, int* state)
+    constexpr int GetFlipPattern(int patternId, int state)
     {
-        if (patternId == kPatternMobil)
-            return;
-        *state = GetSymmetry(patternId, *state);
-    }
-
-    inline int GetFlipPattern(int patternId, int state)
-    {
-        if (patternId == kPatternMobil)
-            return state;
         const int shape = kPattern2Shape[patternId];
         const int digit = kShapeDigits[shape];
-        const int rev   = ReverseOffset(patternId, state);
-        return OpponentIndex(rev, digit);
-    }
-
-    inline void FlipPattern(int patternId, int* state)
-    {
-        *state = GetFlipPattern(patternId, *state);
+        return OpponentIndex(state, digit);
     }
 
 }

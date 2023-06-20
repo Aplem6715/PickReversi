@@ -1,10 +1,10 @@
 ﻿#ifndef CONST_H
 #define CONST_H
 
-#define GLOBAL_SEED 42
-
 #include "type.h"
 #include <string>
+
+constexpr int kSeed = 42;
 
 // 盤面サイズ
 constexpr unsigned char kBoardSize = 8;
@@ -15,7 +15,7 @@ const std::string kInvalidIcon = "Err";
 
 /// 1石あたりのWeight
 /// (int16の最大値32767 / 64 = 511.9 より256を選択．よって最大石差64のとき256 * 64 = 16384)
-constexpr int16_t kWeightOneStone   = 256;
+constexpr int16_t kWeightOneStone = 256;
 
 // 評価値定数
 constexpr score_t kEvalMax     = 64;
@@ -28,8 +28,9 @@ constexpr score_t kEvalInvalid = -127;
 // 参考：https://eukaryote.hateblo.jp/entry/2023/05/17/163629
 constexpr int kMaxMove = 33;
 
-constexpr int kNumPhase     = 15;
-constexpr int kNumPut1Phase = 60 / kNumPhase;
+constexpr int kNumPut1Phase = 4;
+constexpr int kNumPhase     = 60 / kNumPut1Phase;
+static_assert(60 % kNumPut1Phase == 0);
 
 constexpr int Phase(int nbEmpty)
 {

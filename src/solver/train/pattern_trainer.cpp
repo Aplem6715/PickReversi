@@ -1,3 +1,5 @@
+#if TRAIN_BUILD
+
 #include "pattern_trainer.h"
 #include "../eval/pattern_eval.h"
 #include "../eval/pattern_formatter.h"
@@ -19,6 +21,39 @@ namespace train
         trainWeights_ = nullptr;
     }
 
+    double PatternTrainer::Run(BatchBuffer& buffer, double testRatio)
+    {
+        const int numTrain = buffer.GetNumBatches() * (1.0 - testRatio);
+        const int numTest  = buffer.GetNumBatches() - numTrain;
+        Batch batch;
+
+        /*  Train  */
+
+        for (int i = 0; i < numTrain; ++i)
+        {
+            if (buffer.GetBatch(i, batch))
+            {
+                Train(batch, buffer.GetPhase());
+            }
+            else
+            {
+                assert(false);
+            }
+        }
+
+        /*  Test  */
+
+        double sumMAE = 0;
+        for (int i = 0; i < numTest; ++i)
+        {
+            if (buffer.GetBatch(numTrain + i, batch))
+            {
+                sumMAE += Test(batch, buffer.GetPhase());
+            }
+        }
+        return sumMAE / numTest;
+    }
+
     void PatternTrainer::Train(const Batch& batchData, int phase)
     {
         for (const auto& record : batchData)
@@ -36,6 +71,9 @@ namespace train
         {
             trainWeights_[0][phase][i].UpdateAdam();
         }
+
+        ApplyWeight();
+        BuildWeight(eval_->weight_[0][0]);
     }
 
     void PatternTrainer::Train(const std::array<int, kPatternNum> states, int phase, int diff)
@@ -46,16 +84,42 @@ namespace train
         // 出現したパターンのステートについて勾配を記録
         for (int i = 0; i < states.size(); ++i)
         {
-            int state = states[i];
-            UnifySymmetry(i, &state);
-            trainWeights_[0][phase][state].AddGrad(diff);
+            const int offset   = kPatternOffset[i];
+            const int state    = states[i] - offset;
+            const int symm     = GetSymmetry(i, state);
+            const int oppState = GetFlipPattern(i, state);
+            const int oppSymm  = GetSymmetry(i, oppState);
+
+            const int ownIndex    = std::min(state, symm);
+            const int oppIndex    = std::min(oppState, oppSymm);
+            const int targetIndex = std::min(ownIndex, oppIndex);
+            const bool isOpp      = targetIndex == oppIndex;
+            const int grad        = (isOpp ? -1 : 1) * diff;
+
+            // 敵味方反転パターンのほうがstateが小さいときはそっちを採用.
+            // スコアを逆転して勾配計算.
+            trainWeights_[0][phase][offset + targetIndex].AddGrad(grad);
         }
+    }
+
+    double PatternTrainer::Test(const Batch& testData, int phase)
+    {
+        double mae = 0;
+        for (const auto& record : testData)
+        {
+            const auto stone = record->stone;
+            eval_->Reload(stone.own_, stone.opp_);
+            int pred = eval_->Evaluate(phase);
+            mae += std::abs(record->result - pred);
+        }
+        mae /= testData.size();
+        return mae;
     }
 
     void PatternTrainer::ApplyWeight()
     {
         TrainWeight* source = trainWeights_[0][0];
-        short* target       = eval_->weight_[0][0];
+        uint16_t* target    = eval_->weight_[0][0];
 
         for (int i = 0; i < kWeightDataSize; i++)
         {
@@ -67,29 +131,6 @@ namespace train
             srcWeight = std::round(srcWeight);
 
             target[i] = srcWeight;
-        }
-    }
-
-    void PatternTrainer::ShareWeight(short* target)
-    {
-        constexpr int kSideOffset = kNumPhase * kNumWeight;
-        for (int p = 0; p < kPatternNum; ++p)
-        {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int i = 0; i < kShapeIndexMax[shape]; i++)
-            {
-                int symmIndex = GetSymmetry(p, i);
-                int oppIndex  = GetFlipPattern(p, i);
-                if (i != symmIndex)
-                {
-                    target[offset + symmIndex] = target[offset + i];
-                }
-                if (i != oppIndex)
-                {
-                    target[kSideOffset + offset + oppIndex] = target[kSideOffset + offset + i];
-                }
-            }
         }
     }
 
@@ -122,3 +163,5 @@ namespace train
         return true;
     }
 }
+
+#endif

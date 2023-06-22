@@ -7,9 +7,28 @@
 
 #include <cassert>
 
+#if ENABLE_DEPTH_TEMPLATE
+#define MidAlphaBetaSwitch(upLimit, lowLimit, depth, passed) MidAlphaBeta<depth>(upLimit, lowLimit, passed)
+#else
+#define MidAlphaBetaSwitch(upLimit, lowLimit, depth, passed) MidAlphaBeta(upLimit, lowLimit, depth, passed)
+#endif
+
 namespace solver
 {
     template class Searcher<eval::PositionEval>;
+
+    constexpr int kHashDepth  = 4;
+    constexpr int kOrderDepth = 6;
+
+    template <int N>
+    concept hash_enable_depth = requires() {
+        N > kHashDepth;
+    };
+
+    template <int N>
+    concept order_enable_depth = requires() {
+        N > kOrderDepth;
+    };
 
     using Stone = board::Stone;
 
@@ -167,7 +186,7 @@ namespace solver
         score_t lower     = kEvalMin - 1;
         score_t upper     = kEvalMax + 1;
         score_t bestScore = kEvalInvalid;
-        Position bestMove   = Position::NoMove;
+        Position bestMove = Position::NoMove;
         score_t score;
         int depth = option_.midDepth_;
 
@@ -282,8 +301,14 @@ namespace solver
         return bestScore;
     }
 
+#if ENABLE_DEPTH_TEMPLATE
+    template <class Evaluator>
+    template <int depth>
+    score_t Searcher<Evaluator>::MidAlphaBeta(const score_t upLimit, const score_t lowLimit, const bool passed)
+#else
     template <class Evaluator>
     score_t Searcher<Evaluator>::MidAlphaBeta(const score_t upLimit, const score_t lowLimit, const int depth, const bool passed)
+#endif
     {
         if (depth == 0)
         {
@@ -316,7 +341,7 @@ namespace solver
         }
 
         score_t bestScore = kEvalInvalid;
-        Position bestMove   = Position::NoMove;
+        Position bestMove = Position::NoMove;
         MoveList moveList[1];
         MakeMoveList(moveList);
 
@@ -329,7 +354,7 @@ namespace solver
             else
             {
                 UpdatePass();
-                bestScore = -MidAlphaBeta(-lower, -upper, depth, true);
+                bestScore = -MidAlphaBetaSwitch(-lower, -upper, depth, true);
                 UpdatePass();
                 bestMove = Position::Pass;
             }
@@ -343,7 +368,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -MidAlphaBeta(-lower, -upper, depth - 1, false);
+                const score_t score = -MidAlphaBetaSwitch(-lower, -upper, depth, false);
                 Restore(move, true);
 
                 if (score > bestScore)
@@ -379,7 +404,7 @@ namespace solver
         score_t lower     = kEvalMin - 1;
         score_t upper     = kEvalMax + 1;
         score_t bestScore = kEvalInvalid;
-        Position bestMove   = Position::NoMove;
+        Position bestMove = Position::NoMove;
         score_t score;
         int depth = nbEmpty_;
 
@@ -503,8 +528,8 @@ namespace solver
         }
         PROFILE(++prof_.nodeCount);
 
-        score_t lower   = low_limit;
-        score_t upper   = up_limit;
+        score_t lower     = low_limit;
+        score_t upper     = up_limit;
         Position bestMove = Position::NoMove;
 
         HashData hashData;

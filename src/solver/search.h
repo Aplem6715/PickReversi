@@ -74,7 +74,12 @@ namespace solver
         score_t MidMinMax(int depth, bool passed);
 
         /// @brief 中盤αβ探索
+        #if ENABLE_DEPTH_TEMPLATE
+        template<int depth>
+        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const bool passed);
+        #else
         score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+        #endif
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート

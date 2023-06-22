@@ -10,7 +10,7 @@ namespace eval
         // weightのメモリ確保．
         // キャッシュに乗るようにまとめて確保する
         // (本体は [weight_[0][0] = ...] の行)
-        weight_ = AllocPatternWeight<uint16_t>();
+        weight_ = AllocPatternWeight<int16_t>();
     }
 
     PatternEval::PatternEval(const std::string& path) : PatternEval()
@@ -57,7 +57,7 @@ namespace eval
         {
             return false;
         }
-        f.write(reinterpret_cast<const char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(uint16_t));
+        f.write(reinterpret_cast<const char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(int16_t));
         return true;
     }
 
@@ -68,7 +68,7 @@ namespace eval
         {
             return false;
         }
-        f.read(reinterpret_cast<char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(uint16_t));
+        f.read(reinterpret_cast<char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(int16_t));
         return true;
     }
 }

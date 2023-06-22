@@ -33,6 +33,7 @@ target_link_libraries(UnitTest gtest gtest_main pthread)
 
 enable_testing()
 add_compile_definitions(UNIT_TEST)
+add_compile_definitions(TRAIN_BUILD)
 
 include(GoogleTest)
 gtest_add_tests(TARGET UnitTest)

@@ -222,49 +222,6 @@ namespace eval
         delete[] weight[0];
         delete[] weight;
     }
-
-    inline void BuildWeight(uint16_t* target)
-    {
-        constexpr int kSideOffset = kNumPhase * kNumWeight;
-
-        // 対称パターンへweightをコピー
-        for (int p = 0; p < kPatternNum; ++p)
-        {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int state = 0; state < kShapeIndexMax[shape]; state++)
-            {
-                // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
-                // 反転パターンについては評価値を±反転させる
-                int symmIndex = GetSymmetry(p, state);
-                int oppState  = GetFlipPattern(p, state);
-                int oppSymm   = GetSymmetry(p, oppState);
-
-                const int ownIndex = std::min(state, symmIndex);
-                const int oppIndex = std::min(oppState, oppSymm);
-                const int srcIndex = std::min(ownIndex, oppIndex);
-                bool isOpp         = srcIndex == oppIndex;
-
-                if (srcIndex != state)
-                {
-                    target[offset + state] = (isOpp ? -1 : 1) * target[offset + srcIndex];
-                }
-            }
-        }
-
-        // 相手にとってのweightを設定
-        for (int p = 0; p < kPatternNum; ++p)
-        {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int i = 0; i < kShapeIndexMax[shape]; i++)
-            {
-                int oppIndex = GetFlipPattern(p, i);
-
-                target[kSideOffset + offset + oppIndex] = target[offset + i];
-            }
-        }
-    }
 }
 
 #endif

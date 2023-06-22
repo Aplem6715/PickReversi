@@ -6,6 +6,7 @@
 #include "board/stone.h"
 #include "train_const.h"
 #include <vector>
+#include <array>
 
 namespace train
 {
@@ -25,7 +26,7 @@ namespace train
     public:
         BatchBuffer(int batchSize, int bufferSize, int phase) : batchSize_(batchSize), bufferSize_(bufferSize), phase_(phase), isDirty_(false){};
 
-        bool GetBatch(int batchId, const Batch& batch);
+        bool GetBatch(int batchId, Batch& batch);
 
         // clang-format off
         size_t          Size()          const { return buffer_.size(); }

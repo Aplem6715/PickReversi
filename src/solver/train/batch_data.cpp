@@ -7,8 +7,8 @@
 
 namespace train
 {
-    
-    bool BatchBuffer::GetBatch(int batchId, const Batch& batch)
+
+    bool BatchBuffer::GetBatch(int batchId, Batch& batch)
     {
         if (batchId < 0 || batchId > GetNumBatches())
         {
@@ -20,9 +20,11 @@ namespace train
             Shuffle();
         }
 
-        auto start = buffer_.front() + batchId * batchSize_;
-        auto end   = start + batchSize_ - 1;
-        std::move(start, end, std::back_inserter(batch));
+        const auto batchHead = batchId * batchSize_;
+        for (int i = 0; i < batchSize_; ++i)
+        {
+            batch[i] = buffer_[batchHead + i];
+        }
 
         return true;
     }

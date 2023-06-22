@@ -6,13 +6,9 @@ namespace solver
 {
     constexpr uint64_t kRawHashMinTrueBits = 8;
 
-    // RawHash[8行x2色][列内8石のパターン]
-    uint64_t RawCode[8 * 2][1 << 8] = {0};
-
     void InitRawHash()
     {
-        std::random_device rd;
-        std::mt19937_64 gen(rd());
+        std::mt19937_64 gen(kSeed);
         std::uniform_int_distribution<uint64_t> dis;
 
         for (int row = 0; row < 8 * 2; row++)
@@ -25,33 +21,6 @@ namespace solver
                 } while (CountBits(RawCode[row][b]) < kRawHashMinTrueBits);
             }
         }
-    }
-
-    uint64_t GetHashCode(const board::Stone& stones)
-    {
-        uint64_t code;
-
-        // 128bit -> 16x8bit
-        const uint8_t* cursor = (const uint8_t*)(&stones);
-
-        code = RawCode[0][cursor[0]];
-        code ^= RawCode[1][cursor[1]];
-        code ^= RawCode[2][cursor[2]];
-        code ^= RawCode[3][cursor[3]];
-        code ^= RawCode[4][cursor[4]];
-        code ^= RawCode[5][cursor[5]];
-        code ^= RawCode[6][cursor[6]];
-        code ^= RawCode[7][cursor[7]];
-        code ^= RawCode[8][cursor[8]];
-        code ^= RawCode[9][cursor[9]];
-        code ^= RawCode[10][cursor[10]];
-        code ^= RawCode[11][cursor[11]];
-        code ^= RawCode[12][cursor[12]];
-        code ^= RawCode[13][cursor[13]];
-        code ^= RawCode[14][cursor[14]];
-        code ^= RawCode[15][cursor[15]];
-
-        return code;
     }
 
     HashTable::HashTable(uint64_t size)
@@ -98,35 +67,9 @@ namespace solver
 
     void HashTable::VersionUp()
     {
-        if (version_ == UINT8_MAX)
-            Clear();
         ++version_;
-    }
-
-    bool HashTable::TryGetValue(const board::Stone& stones, uint64_t hashCode, HashData* data)
-    {
-        uint64_t index = hashCode & mask_;
-        auto pair      = &pairs_[index];
-
-        if (pair->key_ == stones)
-        {
-            PROFILE(++prof_->hit);
-            *data          = pair->value_;
-            data->usedVer_ = version_;
-            return true;
-        }
-
-        pair = &pairs_[ReHash(index)];
-        if (pair->key_ == stones)
-        {
-            PROFILE(++prof_->hit2nd);
-            *data          = pair->value_;
-            data->usedVer_ = version_;
-            return true;
-        }
-
-        *data = kInitHashData;
-        return false;
+        if (version_ > UINT8_MAX )
+            Clear();
     }
 
     void HashTable::Add(const board::Stone& stones, uint64_t hashCode, score_t upper, score_t lower, score_t score, Position move, uint8_t cost, uint8_t depth)

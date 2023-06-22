@@ -119,7 +119,7 @@ namespace train
     void PatternTrainer::ApplyWeight()
     {
         TrainWeight* source = trainWeights_[0][0];
-        uint16_t* target    = eval_->weight_[0][0];
+        int16_t* target     = eval_->weight_[0][0];
 
         for (int i = 0; i < kWeightDataSize; i++)
         {

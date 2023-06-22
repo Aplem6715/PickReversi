@@ -5,6 +5,7 @@
 #include "evaluator.h"
 #include "pattern.h"
 #include "pos2pattern.h"
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -44,7 +45,7 @@ namespace eval
 
         // weight[side][phase][state[patternId]]
         // キャッシュに乗るようにまとめてalloc
-        uint16_t*** weight_;
+        int16_t*** weight_;
 
         Side side_;
 
@@ -69,7 +70,7 @@ namespace eval
     {
         const auto weight = weight_[static_cast<int>(side_)][phase];
 
-        int sum = 0;
+        score_t sum = 0;
         for (const auto& s : state_)
         {
             sum += weight[s];

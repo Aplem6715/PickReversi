@@ -1,10 +1,11 @@
-﻿#if TRAIN_BUILD
-
-#ifndef PATTERN_TRAINER_H
+﻿#ifndef PATTERN_TRAINER_H
 #define PATTERN_TRAINER_H
+
+#if TRAIN_BUILD
 
 #include "../eval/pattern.h"
 #include "../eval/pos2pattern.h"
+#include "batch_data.h"
 #include "train_const.h"
 #include <functional>
 #include <math.h>
@@ -23,12 +24,6 @@ namespace game
 namespace train
 {
     using namespace eval;
-
-    struct TrainRecord;
-    class ReplayBuffer;
-
-    using Batch          = std::vector<const TrainRecord*>;
-    using OnBatchTrained = std::function<void(int /*phase*/)>;
 
     struct TrainWeight
     {
@@ -81,7 +76,6 @@ namespace train
         double Test(const Batch& testData, int phase);
 
         void ApplyWeight();
-        void BuildWeight(uint16_t* target);
     };
 
 }

@@ -12,8 +12,10 @@ namespace solver
         uint8_t usedVer_;
         uint8_t cost_;
         uint8_t depth_;
+
         score8_t lower_;
         score8_t upper_;
+
         Position bestMove_;
         Position secondMove_;
 

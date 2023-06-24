@@ -1,7 +1,7 @@
-#if TRAIN_BUILD
-
 #ifndef TRAIN_CONST_H
 #define TRAIN_CONST_H
+
+#if TRAIN_BUILD
 
 namespace train
 {
@@ -12,13 +12,13 @@ namespace train
     // スムージング・データのかさ増し（隣の開きマス数が同じフェーズ所属なら無視）
     constexpr int kSmoothRange = 2;
 
-    constexpr int kBatchSize = 64;
+    constexpr int kBatchSize = 128;
     // 1学習で何Batch使うか
     constexpr int kIteration = 100;
     // バッファがこのサイズ以上溜まったら学習・消化
     constexpr int kReplayBufferSize = kBatchSize * kIteration;
     // 同じデータを何回使い回すか
-    constexpr int kEpoch = 5;
+    constexpr int kEpoch = 10;
 
     // 学習・テストデータ比率（テストデータ側の割合を指定）
     constexpr double kTestRatio = 0.1;

@@ -31,26 +31,37 @@ namespace train
         double gradSum_;
         double moment_;
         double v_;
-        uint32_t numUpdate;
+        uint32_t numUpdate_;
+        uint32_t gradCount_;
 
-        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), numUpdate(0) {}
+        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), numUpdate_(0), gradCount_(0) {}
 
-        void AddGrad(double grad) { gradSum_ += grad; }
+        void AddGrad(double grad)
+        {
+            gradSum_ += grad;
+            ++gradCount_;
+        }
+
         void UpdateAdam()
         {
-            if (gradSum_ == 0)
+            const double grad = gradSum_ / gradCount_;
+            if (grad == 0)
             {
                 return;
             }
-            moment_ = kAdamBeta1 * moment_ + (1 - kAdamBeta1) * gradSum_;
-            v_      = kAdamBeta2 * v_ + (1 - kAdamBeta2) * gradSum_ * gradSum_;
+            
+            moment_ = kAdamBeta1 * moment_ + (1 - kAdamBeta1) * grad;
+            v_      = kAdamBeta2 * v_ + (1 - kAdamBeta2) * grad * grad;
 
-            const double m = moment_ / (1.0f - std::pow(kAdamBeta1, numUpdate));
-            const double v = v_ / (1.0f - std::pow(kAdamBeta2, numUpdate));
+            const double m = moment_ / (1.0f - std::pow(kAdamBeta1, numUpdate_));
+            const double v = v_ / (1.0f - std::pow(kAdamBeta2, numUpdate_));
 
             weight_ = weight_ - kAdamAlpha * m / (sqrt(v) + kAdamEps);
+
             // 更新したらリセット
             gradSum_ = 0;
+            gradCount_ = 0;
+            ++numUpdate_;
         }
     };
 

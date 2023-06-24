@@ -105,19 +105,19 @@ namespace eval
     constexpr auto kSymmetryArrow  = GetArrowSymmetry();
 
     // clang-format off
-    static const uint16_t* kSymmetryPattern[kPatternNum] = {
-        kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      // LINE2
-        kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      // LINE3
-        kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      kSymmetry8.data(),      // LINE4
-        kSymmetry4.data(),      kSymmetry4.data(),      kSymmetry4.data(),      kSymmetry4.data(),      // DIAG4
-        kSymmetry5.data(),      kSymmetry5.data(),      kSymmetry5.data(),      kSymmetry5.data(),      // DIAG5
-        kSymmetry6.data(),      kSymmetry6.data(),      kSymmetry6.data(),      kSymmetry6.data(),      // DIAG6
-        kSymmetry7.data(),      kSymmetry7.data(),      kSymmetry7.data(),      kSymmetry7.data(),      // DIAG7
-        kSymmetry8.data(),      kSymmetry8.data(),                                                      // DIAG8
-        kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     // EDGE
-        kSymmetryCorner.data(), kSymmetryCorner.data(), kSymmetryCorner.data(), kSymmetryCorner.data(), // CORNER
-        kSymmetryArrow.data(),  kSymmetryArrow.data(),  kSymmetryArrow.data(),  kSymmetryArrow.data(),  // ARROW
-        kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     kSymmetry10.data(),     // MIDDLE
+    static const uint16_t* kShapeSymmetry[kShapeNum] = {
+        kSymmetry8.data(),       // LINE2
+        kSymmetry8.data(),       // LINE3
+        kSymmetry8.data(),       // LINE4
+        kSymmetry4.data(),       // DIAG4
+        kSymmetry5.data(),       // DIAG5
+        kSymmetry6.data(),       // DIAG6
+        kSymmetry7.data(),       // DIAG7
+        kSymmetry8.data(),       // DIAG8
+        kSymmetry10.data(),      // EDGE
+        kSymmetryCorner.data(),  // CORNER
+        kSymmetryArrow.data(),   // ARROW
+        kSymmetry10.data(),      // MIDDLE
     };
     // clang-format on
 
@@ -129,11 +129,11 @@ namespace eval
      * @param digit インデックスの3進桁数
      * @return 逆立場のインデックス
      */
-    constexpr int OpponentIndex(int idx, const int digit)
+    constexpr uint16_t OpponentIndex(uint16_t idx, const uint16_t digit)
     {
-        constexpr int oppN[] = {0, 2, 1};
-        int ret              = 0;
-        for (int shift = 0; shift < digit; shift++)
+        constexpr uint16_t oppN[] = {0, 2, 1};
+        uint16_t ret              = 0;
+        for (uint16_t shift = 0; shift < digit; shift++)
         {
             ret += oppN[idx % 3] * kPow3[shift];
             idx /= 3;
@@ -141,58 +141,52 @@ namespace eval
         return ret;
     }
 
-    inline int GetSymmetry(int patternId, int state)
+    inline uint16_t GetSymmetryShape(uint16_t shapeId, uint16_t state)
     {
-        return kSymmetryPattern[patternId][state];
+        return kShapeSymmetry[shapeId][state];
     }
 
-    constexpr int GetFlipPattern(int patternId, int state)
+    constexpr uint16_t GetFlipShape(uint16_t shape, uint16_t state)
     {
-        const int shape = kPattern2Shape[patternId];
-        const int digit = kShapeDigits[shape];
+        const uint16_t digit = kShapeDigits[shape];
         return OpponentIndex(state, digit);
     }
 
-
     inline void BuildWeight(int16_t* target)
     {
-        constexpr int kSideOffset = kNumPhase * kNumWeight;
+        constexpr uint32_t kSideOffset = kNumPhase * kNumWeight;
 
         // 対称パターンへweightをコピー
-        for (int p = 0; p < kPatternNum; ++p)
+        for (int phase = 0; phase < kNumPhase; ++phase)
         {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int state = 0; state < kShapeIndexMax[shape]; state++)
+            const uint32_t phaseOffset = phase * kNumWeight;
+            for (int shape = 0; shape < kShapeNum; ++shape)
             {
-                // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
-                // 反転パターンについては評価値を±反転させる
-                int symmIndex = GetSymmetry(p, state);
-                int oppState  = GetFlipPattern(p, state);
-                int oppSymm   = GetSymmetry(p, oppState);
-
-                const int ownIndex = std::min(state, symmIndex);
-                const int oppIndex = std::min(oppState, oppSymm);
-                const int srcIndex = std::min(ownIndex, oppIndex);
-                bool isOpp         = srcIndex == oppIndex;
-
-                if (srcIndex != state)
+                uint32_t offset = phaseOffset + kShapeIndexHead[shape];
+                for (uint32_t state = 0; state < kShapeIndexMax[shape]; state++)
                 {
-                    target[offset + state] = (isOpp ? -1 : 1) * target[offset + srcIndex];
+                    // 対称パターンと比較して小さいインデックスの方に統合
+                    const uint16_t symmIndex = GetSymmetryShape(shape, state);
+
+                    // MEMO:反転パターン（相手側）は学習データ作成時にボードまるごと反転したものを適用するのでここでは無視
+
+                    if (symmIndex < state)
+                    {
+                        target[offset + state] = target[offset + symmIndex];
+                    }
+                    assert(offset + state <= kSideOffset - 1);
+                    assert(offset + symmIndex <= kSideOffset - 1);
                 }
             }
-        }
 
-        // 相手にとってのweightを設定
-        for (int p = 0; p < kPatternNum; ++p)
-        {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int i = 0; i < kShapeIndexMax[shape]; i++)
+            // 相手にとってのweightを設定
+            for (int shape = 0; shape < kShapeNum; ++shape)
             {
-                int oppIndex = GetFlipPattern(p, i);
-
-                target[kSideOffset + offset + oppIndex] = target[offset + i];
+                uint32_t offset = phaseOffset + kShapeIndexHead[shape];
+                for (uint32_t i = 0; i < kShapeIndexMax[shape]; i++)
+                {
+                    target[kSideOffset + offset + i] = -target[offset + i];
+                }
             }
         }
     }

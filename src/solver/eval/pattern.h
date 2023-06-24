@@ -159,7 +159,7 @@ namespace eval
     }
 
     // 各パターンの先頭(0)のインデックス（kPatternIndexMaxを累積したもの）
-    constexpr std::array<uint32_t, kShapeNum> kPatternIndexHead = MakePatternHeadArray();
+    constexpr std::array<uint32_t, kShapeNum> kShapeIndexHead = MakePatternHeadArray();
 
     constexpr uint32_t CalcNumWeight()
     {
@@ -176,7 +176,7 @@ namespace eval
         std::array<uint32_t, kPatternNum> ret = {0};
         for (int pid = 0; pid < kPatternNum; ++pid)
         {
-            ret[pid] = kPatternIndexHead[kPattern2Shape[pid]];
+            ret[pid] = kShapeIndexHead[kPattern2Shape[pid]];
         }
         return ret;
     }

@@ -149,31 +149,30 @@ namespace eval
 
         for (size_t i = 0; i < 2 * kNumPhase * kNumWeight; ++i)
         {
-            weight[0][0][i] = i;
+            weight[0][0][i] = (i % 2 ? -1 : 1) * i % INT16_MAX;
         }
 
-        for (int p = 0; p < kPatternNum; ++p)
+        BuildWeight(**weight);
+
+        const int sideOffset = kNumPhase * kNumWeight;
+        for (int phase = 0; phase < kNumPhase; ++phase)
         {
-            int shape  = kPattern2Shape[p];
-            int offset = kPatternOffset[p];
-            for (int state = 0; state < kShapeIndexMax[shape]; state++)
+            for (int shape = 0; shape < kShapeNum; ++shape)
             {
-                // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
-                // 反転パターンについては評価値を±反転させる
-                int symmIndex = GetSymmetry(p, state);
-                int oppState  = GetFlipPattern(p, state);
-                int oppSymm   = GetSymmetry(p, oppState);
+                uint32_t offset = phase * kNumWeight + kShapeIndexHead[shape];
+                for (int state = 0; state < kShapeIndexMax[shape]; state++)
+                {
+                    // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
+                    // 反転パターンについては評価値を±反転させる
+                    uint16_t symmIndex = GetSymmetryShape(shape, state);
 
-                EXPECT_EQ(weight[0][0][offset + state], weight[0][0][offset + symmIndex]) << "対称チェック";
-                EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][offset + oppState]) << "反転チェック";
-                EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][offset + oppSymm]) << "対称反転チェック";
+                    EXPECT_EQ(weight[0][0][offset + state], weight[0][0][offset + symmIndex]) << "対称チェック state:" << state << " symm:" << symmIndex;
 
-                constexpr int oppOffset = kNumPhase * kNumWeight;
-                // 相手視点(weight[1][*][*]) 評価値は反転
-                EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][oppOffset + offset + state]) << "敵視点チェック";
-                EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][oppOffset + offset + symmIndex]) << "敵視点対称チェック";
-                EXPECT_EQ(weight[0][0][offset + state], weight[0][0][oppOffset + offset + oppState]) << "敵視点反転チェック";
-                EXPECT_EQ(weight[0][0][offset + state], weight[0][0][oppOffset + offset + oppSymm]) << "敵視点対称反転チェック";
+                    constexpr uint32_t oppOffset = kNumPhase * kNumWeight;
+                    // 相手視点(weight[1][*][*]) 評価値は反転
+                    EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][sideOffset + offset + state]) << "敵視点チェック state:" << state << " state:" << state;
+                    EXPECT_EQ(weight[0][0][offset + state], -weight[0][0][sideOffset + offset + symmIndex]) << "敵視点対称チェック state:" << state << " symm:" << symmIndex;
+                }
             }
         }
     }

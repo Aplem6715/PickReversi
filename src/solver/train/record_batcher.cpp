@@ -48,8 +48,8 @@ namespace train
 
                 // 自分視点
                 AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
-                // 相手視点はパターン学習時に反転して学習するためここでは無視
-                // AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
+                // 相手視点
+                AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
             }
 
             ++pos;

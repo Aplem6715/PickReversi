@@ -86,9 +86,9 @@ namespace train
         {
             const int offset   = kPatternOffset[i];
             const int state    = states[i] - offset;
-            const int symm     = GetSymmetry(i, state);
-            const int oppState = GetFlipPattern(i, state);
-            const int oppSymm  = GetSymmetry(i, oppState);
+            const int symm     = GetSymmetryShape(i, state);
+            const int oppState = GetFlipShape(i, state);
+            const int oppSymm  = GetSymmetryShape(i, oppState);
 
             const int ownIndex    = std::min(state, symm);
             const int oppIndex    = std::min(oppState, oppSymm);

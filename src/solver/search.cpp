@@ -368,7 +368,7 @@ namespace solver
             while (const Move* move = moveList->GetNextBest())
             {
                 Update(move, true);
-                const score_t score = -MidAlphaBetaSwitch(-lower, -upper, depth, false);
+                const score_t score = -MidAlphaBetaSwitch(-lower, -upper, depth - 1, false);
                 Restore(move, true);
 
                 if (score > bestScore)

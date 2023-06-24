@@ -20,7 +20,7 @@ namespace eval
 
     score_t PositionEval::Evaluate(int phase)
     {
-        score_t score     = 0;
+        int score         = 0;
         const stone_t own = _own;
         const stone_t opp = _opp;
         for (int i = 0; i < kBoardSize * kBoardSize; i++)
@@ -32,9 +32,9 @@ namespace eval
             score -= ((opp >> i) & 1) * ValueTable[i];
         }
 
-        score = std::clamp(score, kEvalMin, kEvalMax);
+        score = std::clamp(score, (int)kEvalMin, (int)kEvalMax);
 
-        return score;
+        return static_cast<score_t>(score);
     }
 
     void PositionEval::Reload(stone_t own, stone_t opp)

@@ -46,15 +46,10 @@ namespace train
                 const Color side       = board.GetSide();
                 const int resultForOwn = result * (side == Color::Black ? 1 : -1);
 
-                TrainRecord* dataPtr;
-                auto&& stone = Stone{board.GetOwn(), board.GetOpp()};
-                dataPtr      = storage_.Store({stone, resultForOwn});
-                AddRecord(dataPtr, nbEmpty);
-
-                // 反転
-                stone   = Stone{board.GetOpp(), board.GetOwn()};
-                dataPtr = storage_.Store({stone, -resultForOwn});
-                AddRecord(dataPtr, nbEmpty);
+                // 自分視点
+                AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
+                // 相手視点はパターン学習時に反転して学習するためここでは無視
+                // AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
             }
 
             ++pos;
@@ -70,8 +65,24 @@ namespace train
         buffer_[phase]->Clear();
     }
 
-    void ReplayBuffer::AddRecord(const TrainRecord* record, int nbEmpty)
+    void ReplayBuffer::AddNewAllSymmetry(stone_t own, stone_t opp, int diff, int nbEmpty)
     {
+        AddNewRecord(own, opp, diff, nbEmpty);
+        AddNewRecord(ReverseH(own), ReverseH(opp), diff, nbEmpty);
+        AddNewRecord(ReverseV(own), ReverseV(opp), diff, nbEmpty);
+        AddNewRecord(ReverseDiagUp(own), ReverseDiagUp(opp), diff, nbEmpty);
+        AddNewRecord(ReverseDiagDown(own), ReverseDiagDown(opp), diff, nbEmpty);
+        AddNewRecord(RotateR(own), RotateR(opp), diff, nbEmpty);
+        AddNewRecord(RotateL(own), RotateL(opp), diff, nbEmpty);
+        AddNewRecord(Rotate180(own), Rotate180(opp), diff, nbEmpty);
+    }
+
+    void ReplayBuffer::AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty)
+    {
+        TrainRecord* record;
+        Stone&& stone = {own, opp};
+        record = storage_.Store({stone, diff});
+
         const int first = Phase(nbEmpty - kSmoothRange);
         const int last  = Phase(nbEmpty + kSmoothRange);
 

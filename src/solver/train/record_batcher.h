@@ -51,7 +51,8 @@ namespace train
         // sizeof(TrainRecord) = 24[byte] * 1 << 24 => 402[MB]
         Storage<TrainRecord, kStorageCapacity> storage_;
 
-        void AddRecord(const TrainRecord* record, int nbEmpty);
+        void AddNewAllSymmetry(stone_t own, stone_t opp, int diff, int nbEmpty);
+        void AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty);
     };
 }
 

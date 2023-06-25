@@ -27,6 +27,8 @@ namespace train
         const int numTest  = buffer.GetNumBatches() - numTrain;
         Batch batch;
 
+        buffer.Shuffle();
+
         /*  Train  */
 
         for (int i = 0; i < numTrain; ++i)
@@ -76,29 +78,22 @@ namespace train
         BuildWeight(eval_->weight_[0][0]);
     }
 
-    void PatternTrainer::Train(const std::array<int, kPatternNum> states, int phase, int diff)
+    void PatternTrainer::Train(const std::array<state_t, kPatternNum> states, int phase, int diff)
     {
         // 出現していないweightはdiff * 0なので
         // そもそも更新の必要がない
 
         // 出現したパターンのステートについて勾配を記録
-        for (int i = 0; i < states.size(); ++i)
+        for (int pattern = 0; pattern < states.size(); ++pattern)
         {
-            const int offset   = kPatternOffset[i];
-            const int state    = states[i] - offset;
-            const int symm     = GetSymmetryShape(i, state);
-            const int oppState = GetFlipShape(i, state);
-            const int oppSymm  = GetSymmetryShape(i, oppState);
+            const uint32_t offset = kPatternOffset[pattern];
+            const state_t state   = states[pattern] - offset;
+            const state_t symm    = GetSymmetryShape(kPattern2Shape[pattern], state);
 
-            const int ownIndex    = std::min(state, symm);
-            const int oppIndex    = std::min(oppState, oppSymm);
-            const int targetIndex = std::min(ownIndex, oppIndex);
-            const bool isOpp      = targetIndex == oppIndex;
-            const int grad        = (isOpp ? -1 : 1) * diff;
+            // 対称パターンのほうがstateが小さいときはそっちを採用.
+            const int targetIndex = std::min(state, symm);
 
-            // 敵味方反転パターンのほうがstateが小さいときはそっちを採用.
-            // スコアを逆転して勾配計算.
-            trainWeights_[0][phase][offset + targetIndex].AddGrad(grad);
+            trainWeights_[0][phase][offset + targetIndex].AddGrad(diff);
         }
     }
 

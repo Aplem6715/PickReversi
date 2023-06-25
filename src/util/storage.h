@@ -2,6 +2,7 @@
 #define STORAGE_H
 
 #include <array>
+#include <cassert>
 #include "util/stack.h"
 
 template <typename T, size_t Size>
@@ -33,6 +34,7 @@ inline Storage<T, Size>::Storage()
 template <typename T, size_t Size>
 inline T* Storage<T, Size>::Store(T&& item)
 {
+    assert(openIndices_.size() > 0);
     auto index = openIndices_.top();
     openIndices_.pop();
     storage_[index] = item;

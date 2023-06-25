@@ -70,7 +70,7 @@ namespace eval
     {
         const auto weight = weight_[static_cast<int>(side_)][phase];
 
-        score_t sum = 0;
+        int sum = 0;
         for (const auto& s : state_)
         {
             sum += weight[s];
@@ -81,7 +81,7 @@ namespace eval
         sum += sign * kWeightOneStone / 2;
         sum /= kWeightOneStone;
 
-        return static_cast<score_t>(std::clamp(sum, kEvalMin, kEvalMax));
+        return static_cast<score_t>(std::clamp(sum, (int)kEvalMin, (int)kEvalMax));
     }
 
     inline void PatternEval::Update(const Position pos, stone_t flips)

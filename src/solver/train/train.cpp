@@ -7,6 +7,7 @@
 #include "record_batcher.h"
 #include "train_const.h"
 #include <filesystem>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -42,12 +43,13 @@ namespace train
         getFilePaths(kTrainDataDir, &allFiles);
 
         std::ofstream logfile(kLogDir, std::ios::trunc); // 追記モードでファイルを開く
+        int i = 0;
         for (auto& file : allFiles)
         {
             book.ReadAscii(file);
             buffer->Load(book);
 
-            logfile << "Read Book: " << file << std::endl;
+            logfile << "Read Book " << i << ": " << file << std::endl;
             for (int phase = 0; phase < kNumPhase; ++phase)
             {
                 logfile << "phase " << phase << ": " << buffer->GetBatchBuffer(phase)->Size() << std::endl;
@@ -64,9 +66,14 @@ namespace train
 
                     for (int epoch = 0; epoch < kEpoch; ++epoch)
                     {
-                        auto mae = trainer.Run(*buffer->GetBatchBuffer(phase), kTestRatio);
-                        // Epochごとにログファイルにログを出力する
-                        logfile << "\tEpoch " << epoch << ": MAE = " << mae << std::endl;
+                        std::ofstream csv(std::format("log/mae_phase{}.csv", phase), std::ios::trunc);
+                        {
+                            double trainMAE;
+                            auto mae = trainer.Run(*buffer->GetBatchBuffer(phase), &trainMAE, csv);
+                            // Epochごとにログファイルにログを出力する
+                            logfile << "\tEpoch " << epoch << ": train MAE=" << trainMAE << " test MAE=" << mae << std::endl;
+                        }
+                        csv.close();
                     }
                     logfile << std::endl;
 
@@ -75,6 +82,10 @@ namespace train
             }
             logfile << std::endl;
             book.Clear();
+
+            auto saveFile = std::format("resources/weights/weight_{}.dat", i);
+            eval_.Save(saveFile);
+            ++i;
         }
 
         logfile.close();

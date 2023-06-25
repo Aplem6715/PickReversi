@@ -21,52 +21,58 @@ namespace train
         trainWeights_ = nullptr;
     }
 
-    double PatternTrainer::Run(BatchBuffer& buffer, double testRatio)
+    double PatternTrainer::Run(BatchBuffer& buffer, double* trainMAE, std::ofstream& outCSV)
     {
-        const int numTrain = buffer.GetNumBatches() * (1.0 - testRatio);
-        const int numTest  = buffer.GetNumBatches() - numTrain;
+        const int numTrain = buffer.GetNumBatches() - kNumTestBatch;
         Batch batch;
 
         buffer.Shuffle();
 
-        /*  Train  */
-
+        double mae = 0;
         for (int i = 0; i < numTrain; ++i)
         {
+            /*  Train  */
             if (buffer.GetBatch(i, batch))
             {
-                Train(batch, buffer.GetPhase());
+                *trainMAE = Train(batch, buffer.GetPhase());
             }
             else
             {
                 assert(false);
             }
-        }
 
-        /*  Test  */
-
-        double sumMAE = 0;
-        for (int i = 0; i < numTest; ++i)
-        {
-            if (buffer.GetBatch(numTrain + i, batch))
+            /* Test */
+            double sumMAE = 0;
+            const int end = buffer.GetNumBatches();
+            for (int t = numTrain; t < end; ++t)
             {
-                sumMAE += Test(batch, buffer.GetPhase());
+                if (buffer.GetBatch(t, batch))
+                {
+                    sumMAE += Test(batch, buffer.GetPhase());
+                }
             }
+            mae = sumMAE / kNumTestBatch;
+            outCSV << *trainMAE << "," << mae << std::endl;
         }
-        return sumMAE / numTest;
+
+        return mae;
     }
 
-    void PatternTrainer::Train(const Batch& batchData, int phase)
+    double PatternTrainer::Train(const Batch& batchData, int phase)
     {
+        double diffSum = 0;
         for (const auto& record : batchData)
         {
             const auto stone = record->stone;
             eval_->Reload(stone.own_, stone.opp_);
             int pred = eval_->Evaluate(phase);
             int diff = record->result - pred;
-
-            const auto& state = eval_->state_;
-            Train(state, phase, diff);
+            diffSum += std::abs(diff);
+            if (diff != 0)
+            {
+                const auto& state = eval_->state_;
+                Train(state, phase, diff);
+            }
         }
 
         for (int i = 0; i < kNumWeight; i++)
@@ -74,8 +80,9 @@ namespace train
             trainWeights_[0][phase][i].UpdateAdam();
         }
 
-        ApplyWeight();
+        ApplyWeight(phase);
         BuildWeight(eval_->weight_[0][0]);
+        return diffSum / batchData.size();
     }
 
     void PatternTrainer::Train(const std::array<state_t, kPatternNum> states, int phase, int diff)
@@ -91,9 +98,9 @@ namespace train
             const state_t symm    = GetSymmetryShape(kPattern2Shape[pattern], state);
 
             // 対称パターンのほうがstateが小さいときはそっちを採用.
-            const int targetIndex = std::min(state, symm);
+            const state_t targetIndex = std::min(state, symm);
 
-            trainWeights_[0][phase][offset + targetIndex].AddGrad(diff);
+            trainWeights_[0][phase][offset + targetIndex].AddGrad(diff / 64.0);
         }
     }
 
@@ -111,12 +118,12 @@ namespace train
         return mae;
     }
 
-    void PatternTrainer::ApplyWeight()
+    void PatternTrainer::ApplyWeight(int phase)
     {
-        TrainWeight* source = trainWeights_[0][0];
-        int16_t* target     = eval_->weight_[0][0];
+        TrainWeight* source = trainWeights_[0][phase];
+        int16_t* target     = eval_->weight_[0][phase];
 
-        for (int i = 0; i < kWeightDataSize; i++)
+        for (int i = 0; i < kNumWeight; i++)
         {
             double srcWeight = source[i].weight_;
 
@@ -124,6 +131,7 @@ namespace train
             srcWeight *= 64;
             srcWeight *= kWeightOneStone;
             srcWeight = std::round(srcWeight);
+            srcWeight = std::clamp(srcWeight, static_cast<double>(INT16_MIN), static_cast<double>(INT16_MAX));
 
             target[i] = srcWeight;
         }

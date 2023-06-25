@@ -83,7 +83,7 @@ namespace train
         TrainWeight*** trainWeights_;
 
         void Train(const Batch& batchData, int phase);
-        void Train(const std::array<int, kPatternNum> states, int phase, int diff);
+        void Train(const std::array<state_t, kPatternNum> states, int phase, int diff);
         double Test(const Batch& testData, int phase);
 
         void ApplyWeight();

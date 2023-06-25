@@ -12,6 +12,11 @@
 			"command": "cmake --build ${workspaceFolder}/build --target bench -j 10 --"
 		},
 		{
+			"label": "Build Train",
+			"type": "shell",
+			"command": "cmake --build ${workspaceFolder}/build --target train -j 10 --"
+		},
+		{
 			"label": "Build Test",
 			"type": "shell",
 			"command": "cmake --build ${workspaceFolder}/build --target UnitTest -j 10 --"

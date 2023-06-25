@@ -1,4 +1,4 @@
-#ifndef REGRESSOR_H
+﻿#ifndef REGRESSOR_H
 #define REGRESSOR_H
 
 #include "board/bit.h"
@@ -41,7 +41,7 @@ namespace eval
     private:
         // 各パターンのステート（石の状態）
         // ステートはパターンに応じてシフト済み
-        std::array<int, kPatternNum> state_;
+        std::array<state_t, kPatternNum> state_;
 
         // weight[side][phase][state[patternId]]
         // キャッシュに乗るようにまとめてalloc

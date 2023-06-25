@@ -141,12 +141,12 @@ namespace eval
         return ret;
     }
 
-    inline uint16_t GetSymmetryShape(uint16_t shapeId, uint16_t state)
+    inline uint16_t GetSymmetryShape(uint16_t shapeId, state_t state)
     {
         return kShapeSymmetry[shapeId][state];
     }
 
-    constexpr uint16_t GetFlipShape(uint16_t shape, uint16_t state)
+    constexpr uint16_t GetFlipShape(uint16_t shape, state_t state)
     {
         const uint16_t digit = kShapeDigits[shape];
         return OpponentIndex(state, digit);
@@ -166,7 +166,7 @@ namespace eval
                 for (uint32_t state = 0; state < kShapeIndexMax[shape]; state++)
                 {
                     // 対称パターンと比較して小さいインデックスの方に統合
-                    const uint16_t symmIndex = GetSymmetryShape(shape, state);
+                    const state_t symmIndex = GetSymmetryShape(shape, state);
 
                     // MEMO:反転パターン（相手側）は学習データ作成時にボードまるごと反転したものを適用するのでここでは無視
 

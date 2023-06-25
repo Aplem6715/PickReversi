@@ -27,6 +27,7 @@ namespace train
         BatchBuffer(int batchSize, int bufferSize, int phase) : batchSize_(batchSize), bufferSize_(bufferSize), phase_(phase), isDirty_(false){};
 
         bool GetBatch(int batchId, Batch& batch);
+        void Shuffle();
 
         // clang-format off
         size_t          Size()          const { return buffer_.size(); }
@@ -47,8 +48,6 @@ namespace train
         void Add(const TrainRecord* record);
         void Clear() { buffer_.clear(); }
 #pragma endregion
-
-        void Shuffle();
 
         friend class ReplayBuffer;
     };

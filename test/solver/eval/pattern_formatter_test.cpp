@@ -160,7 +160,7 @@ namespace eval
             for (int shape = 0; shape < kShapeNum; ++shape)
             {
                 uint32_t offset = phase * kNumWeight + kShapeIndexHead[shape];
-                for (int state = 0; state < kShapeIndexMax[shape]; state++)
+                for (state_t state = 0; state < kShapeIndexMax[shape]; state++)
                 {
                     // 反転，対称パターンで最も小さいインデックスのweightを持ってくる
                     // 反転パターンについては評価値を±反転させる

@@ -186,7 +186,7 @@ namespace eval
 
     constexpr std::array<uint32_t, kPatternNum> kPatternOffset = MakePatternOffset();
 
-    constexpr int ReverseOffset(int patternId, int state)
+    constexpr int ReverseOffset(int patternId, state_t state)
     {
         assert(state - kPatternOffset[patternId] >= 0);
         return state - kPatternOffset[patternId];

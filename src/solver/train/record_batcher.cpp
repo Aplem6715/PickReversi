@@ -68,13 +68,15 @@ namespace train
     void ReplayBuffer::AddNewAllSymmetry(stone_t own, stone_t opp, int diff, int nbEmpty)
     {
         AddNewRecord(own, opp, diff, nbEmpty);
-        AddNewRecord(ReverseH(own), ReverseH(opp), diff, nbEmpty);
-        AddNewRecord(ReverseV(own), ReverseV(opp), diff, nbEmpty);
-        AddNewRecord(ReverseDiagUp(own), ReverseDiagUp(opp), diff, nbEmpty);
-        AddNewRecord(ReverseDiagDown(own), ReverseDiagDown(opp), diff, nbEmpty);
-        AddNewRecord(RotateR(own), RotateR(opp), diff, nbEmpty);
-        AddNewRecord(RotateL(own), RotateL(opp), diff, nbEmpty);
-        AddNewRecord(Rotate180(own), Rotate180(opp), diff, nbEmpty);
+        // パターン側で対称になっているものはインデックスを統一しているため
+        // 対称系は不要
+        // AddNewRecord(ReverseH(own), ReverseH(opp), diff, nbEmpty);
+        // AddNewRecord(ReverseV(own), ReverseV(opp), diff, nbEmpty);
+        // AddNewRecord(ReverseDiagUp(own), ReverseDiagUp(opp), diff, nbEmpty);
+        // AddNewRecord(ReverseDiagDown(own), ReverseDiagDown(opp), diff, nbEmpty);
+        // AddNewRecord(RotateR(own), RotateR(opp), diff, nbEmpty);
+        // AddNewRecord(RotateL(own), RotateL(opp), diff, nbEmpty);
+        // AddNewRecord(Rotate180(own), Rotate180(opp), diff, nbEmpty);
     }
 
     void ReplayBuffer::AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty)

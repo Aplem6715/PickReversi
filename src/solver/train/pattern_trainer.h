@@ -31,10 +31,9 @@ namespace train
         double gradSum_;
         double moment_;
         double v_;
-        uint32_t numUpdate_;
         uint32_t gradCount_;
 
-        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), numUpdate_(0), gradCount_(0) {}
+        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), gradCount_(0) {}
 
         void AddGrad(double grad)
         {
@@ -44,24 +43,20 @@ namespace train
 
         void UpdateAdam()
         {
-            const double grad = gradSum_ / gradCount_;
-            if (grad == 0)
+            if (gradSum_ == 0 || gradCount_ == 0)
             {
                 return;
             }
-            
-            moment_ = kAdamBeta1 * moment_ + (1 - kAdamBeta1) * grad;
-            v_      = kAdamBeta2 * v_ + (1 - kAdamBeta2) * grad * grad;
+            const double grad = gradSum_ / gradCount_;
 
-            const double m = moment_ / (1.0f - std::pow(kAdamBeta1, numUpdate_));
-            const double v = v_ / (1.0f - std::pow(kAdamBeta2, numUpdate_));
+            moment_ = (1 - kAdamBeta1) * (grad - moment_);
+            v_      = (1 - kAdamBeta2) * (grad * grad - v_);
 
-            weight_ = weight_ - kAdamAlpha * m / (sqrt(v) + kAdamEps);
+            weight_ -= kAdamAlpha * moment_ / (sqrt(v_) + kAdamEps);
 
             // 更新したらリセット
-            gradSum_ = 0;
+            gradSum_   = 0;
             gradCount_ = 0;
-            ++numUpdate_;
         }
     };
 
@@ -71,7 +66,7 @@ namespace train
         PatternTrainer(PatternEval* eval);
         ~PatternTrainer();
 
-        double Run(BatchBuffer& buffer, double testRatio);
+        double Run(BatchBuffer& buffer, double* trainMAE, std::ofstream& outCsv);
 
         bool SaveCheckpoint(const std::string& path);
         bool LoadCheckpoint(const std::string& path);
@@ -82,11 +77,11 @@ namespace train
         // 学習用weight
         TrainWeight*** trainWeights_;
 
-        void Train(const Batch& batchData, int phase);
+        double Train(const Batch& batchData, int phase);
         void Train(const std::array<state_t, kPatternNum> states, int phase, int diff);
         double Test(const Batch& testData, int phase);
 
-        void ApplyWeight();
+        void ApplyWeight(int phase);
     };
 
 }

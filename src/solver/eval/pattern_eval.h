@@ -1,4 +1,4 @@
-﻿#ifndef REGRESSOR_H
+#ifndef REGRESSOR_H
 #define REGRESSOR_H
 
 #include "board/bit.h"
@@ -155,7 +155,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] += pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -170,7 +170,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] += 2 * pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -185,7 +185,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] -= pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -200,7 +200,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] += pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -215,7 +215,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] -= pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -230,7 +230,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] -= 2 * pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -245,7 +245,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] -= pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 
@@ -260,7 +260,7 @@ namespace eval
             state_[pos2pat.pattern[i].uid] -= 2 * pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
-            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[pos2pat.pattern[i].uid]);
+            assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
     }
 

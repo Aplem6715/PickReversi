@@ -32,8 +32,9 @@ namespace train
         double moment_;
         double v_;
         uint32_t gradCount_;
+        uint32_t numUpdate_;
 
-        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), gradCount_(0) {}
+        TrainWeight() : weight_(0), gradSum_(0), moment_(0), v_(0), gradCount_(0), numUpdate_(0) {}
 
         void AddGrad(double grad)
         {
@@ -48,11 +49,15 @@ namespace train
                 return;
             }
             const double grad = gradSum_ / gradCount_;
+            ++numUpdate_;
 
-            moment_ = (1 - kAdamBeta1) * (grad - moment_);
-            v_      = (1 - kAdamBeta2) * (grad * grad - v_);
+            moment_ = kAdamBeta1 * moment_ + (1 - kAdamBeta1) * grad;
+            v_      = kAdamBeta2 * v_ + (1 - kAdamBeta2) * grad * grad;
 
-            weight_ -= kAdamAlpha * moment_ / (sqrt(v_) + kAdamEps);
+            const double m = moment_ / (1.0f - std::pow(kAdamBeta1, numUpdate_));
+            const double v = v_ / (1.0f - std::pow(kAdamBeta2, numUpdate_));
+
+            weight_ = weight_ - kAdamAlpha * m / (sqrt(v) + kAdamEps);
 
             // 更新したらリセット
             gradSum_   = 0;
@@ -77,10 +82,9 @@ namespace train
         // 学習用weight
         TrainWeight*** trainWeights_;
 
-        double Train(const Batch& batchData, int phase);
+        double Train(const Batch batchData, int phase);
         void Train(const std::array<state_t, kPatternNum> states, int phase, int diff);
-        double Test(const Batch& testData, int phase);
-
+        
         void ApplyWeight(int phase);
     };
 

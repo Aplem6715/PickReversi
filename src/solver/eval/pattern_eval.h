@@ -147,7 +147,7 @@ namespace eval
     inline void PatternEval::PutOwn(const Position pos)
     {
         const PosToPattern& pos2pat = kPos2Pattern[static_cast<int>(pos)];
-        int nbPattern               = pos2pat.numPattern;
+        const int nbPattern         = pos2pat.numPattern;
 
         for (int i = 0; i < nbPattern; ++i)
         {
@@ -157,6 +157,18 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
+        //         // 0(empty) -> 1(own)
+        //         state_[pos2pat.pattern[i].uid] += pos2pat.pattern[i].idx;
+        //         // range check (0 ~ MaxIndex)
+        //         assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
+        //     }
+        // }
     }
 
     inline void PatternEval::PutOpp(const Position pos)
@@ -172,6 +184,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::FlipOwn(const Position pos)
@@ -187,6 +205,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::FlipOpp(const Position pos)
@@ -202,6 +226,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::RestorePutOwn(const Position pos)
@@ -217,6 +247,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::RestorePutOpp(const Position pos)
@@ -232,6 +268,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::RestoreFlipOwn(const Position pos)
@@ -247,6 +289,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
     inline void PatternEval::RestoreFlipOpp(const Position pos)
@@ -262,6 +310,12 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
+        
+        // TODO: 検証: こっちのほうがループ展開されやすそう
+        // for (int i = 0; i < kPosPatternMax; ++i)
+        // {
+        //     if (i < nbPattern)
+        //     {
     }
 
 }

@@ -38,11 +38,11 @@ namespace train
         std::vector<std::string> allFiles;
         std::array<int, kNumPhase> trainCount = {0};
 
-        auto buffer = new ReplayBuffer(kBatchSize, kReplayBufferSize);
+        auto buffer = new ReplayBuffer(kBatchSize, kIteration);
 
         getFilePaths(kTrainDataDir, &allFiles);
 
-        std::ofstream logfile(kLogDir, std::ios::trunc); // 追記モードでファイルを開く
+        std::ofstream logfile(kLogDir, std::ios::trunc);
         int i = 0;
         for (auto& file : allFiles)
         {

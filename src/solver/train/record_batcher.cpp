@@ -58,10 +58,6 @@ namespace train
 
     void ReplayBuffer::Clear(int phase)
     {
-        for (auto b : buffer_[phase]->GetBuffer())
-        {
-            storage_.Remove(b);
-        }
         buffer_[phase]->Clear();
     }
 
@@ -81,9 +77,8 @@ namespace train
 
     void ReplayBuffer::AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty)
     {
-        TrainRecord* record;
         Stone&& stone = {own, opp};
-        record = storage_.Store({stone, diff});
+        TrainRecord record = {stone, diff};
 
         const int first = Phase(nbEmpty - kSmoothRange);
         const int last  = Phase(nbEmpty + kSmoothRange);

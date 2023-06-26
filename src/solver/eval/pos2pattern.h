@@ -18,7 +18,7 @@ namespace eval
     // clang-format off
 
     // 各座標と対応するパターンとその3進インデックス
-    static const PosToPattern kPos2Pattern[] = {
+    static constexpr PosToPattern kPos2Pattern[] = {
         /*A1*/ {7, {{kPatternDiag8_2, kPow3_0}, {kPatternEdgeX_1, kPow3_1}, {kPatternEdgeX_4, kPow3_8}, {kPatternConer_1, kPow3_0}, {kPatternArrow_1, kPow3_4}, {kPatternMidle_1, kPow3_0}, {kPatternMidle_4, kPow3_9}}},
         /*B1*/ {5, {{kPatternLine2_4, kPow3_0}, {kPatternDiag7_2, kPow3_0}, {kPatternEdgeX_1, kPow3_2}, {kPatternConer_1, kPow3_1}, {kPatternArrow_1, kPow3_6}}},
         /*C1*/ {6, {{kPatternLine3_4, kPow3_0}, {kPatternDiag6_2, kPow3_0}, {kPatternEdgeX_1, kPow3_3}, {kPatternConer_1, kPow3_2}, {kPatternArrow_1, kPow3_7}, {kPatternMidle_1, kPow3_1}}},
@@ -93,5 +93,16 @@ namespace eval
     };
     // clang-format on
 
+    constexpr int GetNumPatternMax()
+    {
+        int ret = 0;
+        for (auto pattern : kPos2Pattern)
+        {
+            ret = std::max(ret, (int)pattern.numPattern);
+        }
+        return ret;
+    }
+
+    constexpr int kPosPatternMax = GetNumPatternMax();
 }
 #endif

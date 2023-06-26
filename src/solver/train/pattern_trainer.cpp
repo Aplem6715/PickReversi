@@ -23,50 +23,29 @@ namespace train
 
     double PatternTrainer::Run(BatchBuffer& buffer, double* trainMAE, std::ofstream& outCSV)
     {
-        const int numTrain = buffer.GetNumBatches() - kNumTestBatch;
-        Batch batch;
-
         buffer.Shuffle();
 
-        double mae = 0;
-        for (int i = 0; i < numTrain; ++i)
+        double mae    = 0;
+        const int end = buffer.GetNumBatches();
+        for (int i = 0; i < end; ++i)
         {
-            /*  Train  */
-            if (buffer.GetBatch(i, batch))
-            {
-                *trainMAE = Train(batch, buffer.GetPhase());
-            }
-            else
-            {
-                assert(false);
-            }
-
-            /* Test */
-            double sumMAE = 0;
-            const int end = buffer.GetNumBatches();
-            for (int t = numTrain; t < end; ++t)
-            {
-                if (buffer.GetBatch(t, batch))
-                {
-                    sumMAE += Test(batch, buffer.GetPhase());
-                }
-            }
-            mae = sumMAE / kNumTestBatch;
-            outCSV << *trainMAE << "," << mae << std::endl;
+            const Batch batch = buffer.GetBatch(i);
+            *trainMAE = Train(batch, buffer.GetPhase());
+            outCSV << *trainMAE << std::endl;
         }
 
         return mae;
     }
 
-    double PatternTrainer::Train(const Batch& batchData, int phase)
+    double PatternTrainer::Train(const Batch batchData, int phase)
     {
         double diffSum = 0;
         for (const auto& record : batchData)
         {
-            const auto stone = record->stone;
+            const auto stone = record.stone;
             eval_->Reload(stone.own_, stone.opp_);
             int pred = eval_->Evaluate(phase);
-            int diff = record->result - pred;
+            int diff = record.result - pred;
             diffSum += std::abs(diff);
             if (diff != 0)
             {
@@ -89,6 +68,7 @@ namespace train
     {
         // 出現していないweightはdiff * 0なので
         // そもそも更新の必要がない
+        double grad = static_cast<double>(diff) / 64.0;
 
         // 出現したパターンのステートについて勾配を記録
         for (int pattern = 0; pattern < states.size(); ++pattern)
@@ -100,22 +80,8 @@ namespace train
             // 対称パターンのほうがstateが小さいときはそっちを採用.
             const state_t targetIndex = std::min(state, symm);
 
-            trainWeights_[0][phase][offset + targetIndex].AddGrad(diff / 64.0);
+            trainWeights_[0][phase][offset + targetIndex].AddGrad(grad);
         }
-    }
-
-    double PatternTrainer::Test(const Batch& testData, int phase)
-    {
-        double mae = 0;
-        for (const auto& record : testData)
-        {
-            const auto stone = record->stone;
-            eval_->Reload(stone.own_, stone.opp_);
-            int pred = eval_->Evaluate(phase);
-            mae += std::abs(record->result - pred);
-        }
-        mae /= testData.size();
-        return mae;
     }
 
     void PatternTrainer::ApplyWeight(int phase)
@@ -127,10 +93,12 @@ namespace train
         {
             double srcWeight = source[i].weight_;
 
+            assert(std::abs(source[i].weight_) < INT16_MAX);
             // Remap [-1 ~ 1] → [-64 ~ 64] → [-64*StoneVal ~ 64*StoneVal]
             srcWeight *= 64;
             srcWeight *= kWeightOneStone;
             srcWeight = std::round(srcWeight);
+            assert(std::abs(srcWeight) < INT16_MAX);
             srcWeight = std::clamp(srcWeight, static_cast<double>(INT16_MIN), static_cast<double>(INT16_MAX));
 
             target[i] = srcWeight;

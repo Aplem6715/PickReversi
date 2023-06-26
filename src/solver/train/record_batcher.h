@@ -23,6 +23,9 @@ namespace train
 
     class BatchBuffer;
 
+    // 予想使用メモリ量[MB]（データファイル内のデータ量とkReplayBufferSizeの比率によってkReplayBufferSize以上にバッファリングされる: 2.0倍を想定）
+    constexpr double kBufferMemoryUseMax = kReplayBufferSize * sizeof(TrainRecord) * kNumPhase * 2.0 / 1000.0 / 1000.0;
+
     /// データを読み込み，バッチ分割する。
     /// ・一度ロードしたデータは内部ストレージに記録され，Clearを実行するまで保存される。
     /// ・phaseごとにバッファを持ち，初回バッチ取得時にシャッフルされる。
@@ -48,8 +51,6 @@ namespace train
 
     private:
         BatchBuffer* buffer_[kNumPhase];
-        // sizeof(TrainRecord) = 24[byte] * 1 << 24 => 402[MB]
-        Storage<TrainRecord, kStorageCapacity> storage_;
 
         void AddNewAllSymmetry(stone_t own, stone_t opp, int diff, int nbEmpty);
         void AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty);

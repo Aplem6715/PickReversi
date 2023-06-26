@@ -336,6 +336,7 @@ inline uint64_t Rotate180(uint64_t bits)
     return ReverseH(ReverseV(bits));
 }
 
+// TODO: 「pos」を「Position pos」にしてforブロック内に限定
 #define for_bits(pos, bits) for (pos = BitToPos(bits); bits; pos = NextIndex(&bits))
 
 #pragma warning(pop)

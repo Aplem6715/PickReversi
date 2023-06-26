@@ -5,8 +5,10 @@
 
 #include "board/stone.h"
 #include "train_const.h"
-#include <vector>
 #include <array>
+#include <random>
+#include <span>
+#include <vector>
 
 namespace train
 {
@@ -18,20 +20,19 @@ namespace train
         int result;
     };
 
-    using Batch  = std::array<const TrainRecord*, kBatchSize>;
-    using Buffer = std::vector<const TrainRecord*>;
+    using Batch  = std::span<TrainRecord, std::dynamic_extent>;
+    using Buffer = std::vector<TrainRecord>;
 
     class BatchBuffer
     {
     public:
-        BatchBuffer(int batchSize, int bufferSize, int phase) : batchSize_(batchSize), bufferSize_(bufferSize), phase_(phase), isDirty_(false){};
+        BatchBuffer(int batchSize, int bufferSize, int phase);
 
-        bool GetBatch(int batchId, Batch& batch);
+        Batch GetBatch(int batchId);
         void Shuffle();
 
         // clang-format off
         size_t          Size()          const { return buffer_.size(); }
-        const Buffer&   GetBuffer()     const { return buffer_; }
         int             GetNumBatches() const { return buffer_.size() / batchSize_; }
         int             GetPhase()      const { return phase_; }
         bool            IsFull()        const { return GetNumBatches() >= bufferSize_; }
@@ -43,9 +44,10 @@ namespace train
         int bufferSize_;
         int phase_;
         bool isDirty_;
+        std::mt19937 randEngine_;
 
 #pragma region for Friend
-        void Add(const TrainRecord* record);
+        void Add(const TrainRecord& record);
         void Clear() { buffer_.clear(); }
 #pragma endregion
 

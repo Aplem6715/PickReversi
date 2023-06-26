@@ -52,12 +52,13 @@ namespace eval
 
     bool PatternEval::Save(const std::string& path)
     {
-        std::ofstream f(path, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
+        std::ofstream f(path, std::ios_base::binary | std::ios_base::trunc);
         if (f.fail())
         {
             return false;
         }
-        f.write(reinterpret_cast<const char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(int16_t));
+        f.write(reinterpret_cast<const char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(***weight_));
+        f.close();
         return true;
     }
 
@@ -68,7 +69,8 @@ namespace eval
         {
             return false;
         }
-        f.read(reinterpret_cast<char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(int16_t));
+        f.read(reinterpret_cast<char*>(weight_[0][0]), 2 * kNumPhase * kNumWeight * sizeof(***weight_));
+        f.close();
         return true;
     }
 }

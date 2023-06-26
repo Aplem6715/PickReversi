@@ -14,7 +14,7 @@ namespace train
     // データロード後，バッファがこのサイズ以上溜まっていたら学習・消化
     constexpr int kReplayBufferSize = kBatchSize * kIteration;
     // 同じデータを何回使い回すか
-    constexpr int kEpoch = 1;
+    constexpr int kEpoch = 5;
 
     // Adamハイパーパラメーター
     constexpr double kAdamBeta1 = 0.9;

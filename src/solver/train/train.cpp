@@ -42,6 +42,11 @@ namespace train
 
         getFilePaths(kTrainDataDir, &allFiles);
 
+        for (int phase = 0; phase < kNumPhase; ++phase)
+        {
+            std::remove(std::format("log/mae_phase{}.csv", phase).c_str());
+        }
+
         std::ofstream logfile(kLogDir, std::ios::trunc);
         int i = 0;
         for (auto& file : allFiles)
@@ -64,17 +69,17 @@ namespace train
                     ++trainCount[phase];
                     logfile << "Phase " << phase << ": TrainCount = " << trainCount[phase] << std::endl;
 
-                    for (int epoch = 0; epoch < kEpoch; ++epoch)
+                    std::ofstream csv(std::format("log/mae_phase{}.csv", phase), std::ios::app);
                     {
-                        std::ofstream csv(std::format("log/mae_phase{}.csv", phase), std::ios::trunc);
+                        for (int epoch = 0; epoch < kEpoch; ++epoch)
                         {
                             double trainMAE;
                             auto mae = trainer.Run(*buffer->GetBatchBuffer(phase), &trainMAE, csv);
                             // Epochごとにログファイルにログを出力する
                             logfile << "\tEpoch " << epoch << ": train MAE=" << trainMAE << " test MAE=" << mae << std::endl;
                         }
-                        csv.close();
                     }
+                    csv.close();
                     logfile << std::endl;
 
                     buffer->Clear(phase);

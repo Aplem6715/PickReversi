@@ -68,7 +68,7 @@ namespace train
     {
         // 出現していないweightはdiff * 0なので
         // そもそも更新の必要がない
-        double grad = static_cast<double>(diff) / 64.0;
+        const double grad = -static_cast<double>(diff) / 64.0;
 
         // 出現したパターンのステートについて勾配を記録
         for (int pattern = 0; pattern < states.size(); ++pattern)

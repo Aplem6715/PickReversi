@@ -17,10 +17,10 @@ namespace board
         inline void Update(uint64_t pos, uint64_t flips);
         inline void Restore(Position pos, uint64_t flips) { Restore(PosToBit(pos), flips); }
         inline void Restore(uint64_t pos, uint64_t flips);
-        int GetCountDiff();
+        int GetCountDiff() const;
 
-        uint64_t CalcFlip(const Position index) { return CalcFlip64(own_, opp_, index); }
-        uint64_t CalcMobility() { return CalcMobility64(own_, opp_); }
+        uint64_t CalcFlip(const Position index) const { return CalcFlip64(own_, opp_, index); }
+        uint64_t CalcMobility() const { return CalcMobility64(own_, opp_); }
 
         bool operator==(const Stone& other) const
         {
@@ -50,7 +50,7 @@ namespace board
         opp_ ^= flips;
     }
 
-    inline int Stone::GetCountDiff()
+    inline int Stone::GetCountDiff() const
     {
         return CountBits(own_) - CountBits(opp_);
     }

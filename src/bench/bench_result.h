@@ -28,7 +28,7 @@ namespace bench
     {
         int depth;
         Position pos;
-        score32_t score;
+        score_t score;
         double duration;
         uint64_t nodeCount;
         uint64_t leafCount;

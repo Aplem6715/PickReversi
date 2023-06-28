@@ -1,11 +1,12 @@
 ﻿#include "pos_eval.h"
+#include "board/bit.h"
 #include <algorithm>
 
 namespace eval
 {
 
     // clang-format off
-    extern const score32_t ValueTable[64] = {
+    extern const score_t ValueTable[64] = {
          30, -12,   0,  -1,  -1,   0, -12,  30,
         -12, -15,  -3,  -3,  -3,  -3, -15, -12,
           0,  -3,   0,  -1,  -1,   0,  -3,   0,
@@ -17,9 +18,9 @@ namespace eval
     };
     // clang-format on
 
-    score32_t PositionEvaluator::Evaluate(int nEmpty)
+    score_t PositionEval::Evaluate(int phase)
     {
-        score32_t score     = 0;
+        int score         = 0;
         const stone_t own = _own;
         const stone_t opp = _opp;
         for (int i = 0; i < kBoardSize * kBoardSize; i++)
@@ -31,32 +32,32 @@ namespace eval
             score -= ((opp >> i) & 1) * ValueTable[i];
         }
 
-        score = std::clamp(score, kEvalMin, kEvalMax);
+        score = std::clamp(score, (int)kEvalMin, (int)kEvalMax);
 
-        return score;
+        return static_cast<score_t>(score);
     }
 
-    void PositionEvaluator::Reload(stone_t own, stone_t opp, Side side)
+    void PositionEval::Reload(stone_t own, stone_t opp)
     {
         _own = own;
         _opp = opp;
     }
 
-    void PositionEvaluator::Update(stone_t pos, stone_t flips)
+    void PositionEval::Update(Position pos, stone_t flips)
     {
-        _own = _own ^ (flips | pos);
+        _own = _own ^ (flips | PosToBit(pos));
         _opp = _opp ^ flips;
         Swap();
     }
 
-    void PositionEvaluator::Restore(stone_t pos, stone_t flips)
+    void PositionEval::Restore(Position pos, stone_t flips)
     {
         Swap();
-        _own = _own ^ (flips | pos);
+        _own = _own ^ (flips | PosToBit(pos));
         _opp = _opp ^ flips;
     }
 
-    void PositionEvaluator::UpdatePass()
+    void PositionEval::UpdatePass()
     {
         Swap();
     }

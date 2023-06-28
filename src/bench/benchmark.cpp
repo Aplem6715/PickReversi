@@ -1,6 +1,7 @@
 ﻿
 #include "solver/search.h"
 #include "solver/search_result.h"
+#include "solver/eval/pos_eval.h"
 
 #include "bench_result.h"
 #include "board/board.h"
@@ -15,7 +16,7 @@ namespace bench
 
     Position BenchOnePut(board::Board& board, std::ofstream& file)
     {
-        solver::Searcher searcher[1];
+        solver::Searcher<eval::PositionEval> searcher[1];
         solver::SearchResult result[1];
         Position pos;
 

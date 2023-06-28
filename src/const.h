@@ -1,10 +1,10 @@
 ﻿#ifndef CONST_H
 #define CONST_H
 
-#define GLOBAL_SEED 42
-
 #include "type.h"
 #include <string>
+
+constexpr int kSeed = 42;
 
 // 盤面サイズ
 constexpr unsigned char kBoardSize = 8;
@@ -13,11 +13,29 @@ const std::string kBlackIcon   = "#";
 const std::string kWhiteIcon   = "o";
 const std::string kInvalidIcon = "Err";
 
-/// 1石あたりの評価値
-constexpr int kEvalStone   = 1;
-constexpr int kEvalMax     = kEvalStone * 64;
-constexpr int kEvalMin     = -kEvalMax;
-constexpr int kEvalInvalid = -127;
+/// 1石あたりのWeight
+/// (int16の最大値32767 / 64 = 511.9 より256を選択．よって最大石差64のとき256 * 64 = 16384)
+constexpr int16_t kWeightOneStone = 256;
+
+// 評価値定数
+constexpr score_t kEvalMax     = 64;
+constexpr score_t kEvalMin     = -kEvalMax;
+constexpr score_t kEvalLimit   = 120;
+constexpr score_t kEvalInvalid = -127;
+
+// 1盤面における最大着手可能位置数
+// 棋譜：f5f6e6f4g7c6g3e7d6f3e3d3b7d7c2g2g1c3b2b3b4f7g5c4c7c8e2
+// 参考：https://eukaryote.hateblo.jp/entry/2023/05/17/163629
+constexpr int kMaxMove = 33;
+
+constexpr int kNumPut1Phase = 4;
+constexpr int kNumPhase     = 60 / kNumPut1Phase;
+static_assert(60 % kNumPut1Phase == 0);
+
+constexpr int Phase(int nbEmpty)
+{
+    return nbEmpty / kNumPut1Phase;
+}
 
 enum class Side : uint8_t
 {

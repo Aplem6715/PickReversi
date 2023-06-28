@@ -1,11 +1,14 @@
-﻿#include "game/game.h"
+﻿
+#ifndef TRAIN_BUILD
+
+#include "game/game.h"
 #include "game/record.h"
 #include <iostream>
 #include <stdio.h>
 
 int main()
 {
-    auto game = new game::Game(game::PlayerType::Console, game::PlayerType::AI);
+    auto game = new game::Game(game::PlayerType::Console, game::PlayerType::AI_Pattern);
     game->Play();
     game::MatchBook book;
     book.AddRecord(game->GetRecord());
@@ -14,3 +17,5 @@ int main()
 
     return 0;
 }
+
+#endif

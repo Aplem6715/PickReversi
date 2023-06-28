@@ -18,17 +18,18 @@ namespace eval
         stone_t GetOpp() { return _eval._opp; }
 
     protected:
-        PositionEvaluator _eval;
+        PositionEval _eval;
     };
 
     TEST_F(PositionEvaluator_Test, Update)
     {
-        _eval.Reload(INIT_BLACK, INIT_WHITE, Side::Own);
+        _eval.Reload(INIT_BLACK, INIT_WHITE);
 
-        stone_t pos   = 1 << static_cast<int>(Position::C4);
+        Position pos = Position::C4;
+        stone_t posBit   = 1 << static_cast<int>(pos);
         stone_t flips = 1 << static_cast<int>(Position::D4);
 
-        stone_t flippedBlack = INIT_BLACK ^ flips | pos;
+        stone_t flippedBlack = INIT_BLACK ^ flips | posBit;
         stone_t flippedWhite = INIT_WHITE ^ flips;
 
         _eval.Update(pos, flips);
@@ -57,7 +58,7 @@ namespace eval
         board->Put(Position::B2);
         board->Put(Position::A1);
 
-        _eval.Reload(board->GetOwn(), board->GetOpp(), Side::Opp);
+        _eval.Reload(board->GetOwn(), board->GetOpp());
         EXPECT_EQ(_eval.Evaluate(0), -33);
     }
 }

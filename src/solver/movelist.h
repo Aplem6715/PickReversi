@@ -6,13 +6,10 @@
 namespace solver
 {
 
+    template <class Evaluator>
     class Searcher;
-    struct HashData;
 
-    // 1盤面における最大着手可能位置数
-    // 棋譜：f5f6e6f4g7c6g3e7d6f3e3d3b7d7c2g2g1c3b2b3b4f7g5c4c7c8e2
-    // 参考：https://eukaryote.hateblo.jp/entry/2023/05/17/163629
-    constexpr int kMaxMove = 33;
+    struct HashData;
 
     struct Move
     {
@@ -21,10 +18,11 @@ namespace solver
         Position pos_;
         Move* next_;
 
-        void Evaluate(Searcher& searcher, const HashData& hashData);
+        template <class Evaluator>
+        void Evaluate(Searcher<Evaluator>& searcher, const HashData& hashData);
     };
 
-    const Move kDefaultMove = {0, INT32_MIN, Position::Invalid, nullptr};
+    constexpr Move kDefaultMove = {0, INT32_MIN, Position::Invalid, nullptr};
 
     struct MoveList
     {
@@ -38,8 +36,16 @@ namespace solver
     public:
         Move* GetNextBest();
         Move* GetNext();
-        void Evaluate(Searcher& searcher, const HashData& hashData);
         bool IsEmpty() { return length_ == 0; }
+
+        template <class Evaluator>
+        void Evaluate(Searcher<Evaluator>& searcher, const HashData& hashData)
+        {
+            for (auto move = moves_->next_; move; move = move->next_)
+            {
+                move->Evaluate<Evaluator>(searcher, hashData);
+            }
+        }
     };
 
 }

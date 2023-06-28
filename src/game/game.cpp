@@ -6,12 +6,12 @@
 #include <string>
 
 #include "../const.h"
-// #include "buffer_sink.h"
 #include "game/ai_player.h"
 #include "game/console_player.h"
 #include "game/player.h"
+#include "solver/eval/pos_eval.h"
+#include "solver/eval/pattern_eval.h"
 #include "logger.h"
-// #include "spdlog/sinks/stdout_color_sinks.h"
 #include "util/position_helper.h"
 
 namespace game
@@ -160,8 +160,12 @@ namespace game
             ret = new ConsolePlayer();
             break;
 
-        case PlayerType::AI:
-            ret = new AIPlayer();
+        case PlayerType::AI_Position:
+            ret = new AIPlayer<eval::PositionEval>();
+            break;
+
+        case PlayerType::AI_Pattern:
+            ret = new AIPlayer<eval::PatternEval>();
             break;
 
         default:

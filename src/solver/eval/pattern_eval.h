@@ -111,6 +111,7 @@ namespace eval
 
     inline void PatternEval::Restore(const Position pos, stone_t flips)
     {
+        SwapSide();
         if (side_ == Side::Own)
         {
             RestorePutOwn(pos);
@@ -131,7 +132,6 @@ namespace eval
                 RestoreFlipOpp(flipPos);
             }
         }
-        SwapSide();
     }
 
     inline void PatternEval::UpdatePass()

@@ -37,6 +37,13 @@ namespace train
         const Position* pos = record.moves_;
         for (int i = 0; i < record.nMoves_; ++i)
         {
+            // パス
+            if (!board.CanPut())
+            {
+                board.ChangeSide();
+            }
+
+            assert(board.CheckLegalMove(*pos));
             board.Put(*pos);
 
             if (i >= record.nRandMoves_)

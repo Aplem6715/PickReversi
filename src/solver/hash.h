@@ -76,13 +76,13 @@ namespace solver
         HashData value_;
     };
 
-    void HashData::Update(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
+    inline void HashData::Update(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
     {
         if (depth_ == depth)
         {
             Update(upper, lower, score, move);
         }
-        else
+        else if(depth_ < depth)
         {
             Deepen(upper, lower, score, move, depth);
         }
@@ -95,12 +95,12 @@ namespace solver
         }
     }
 
-    uint32_t HashData::GetPriority() const
+    inline uint32_t HashData::GetPriority() const
     {
         return (static_cast<uint32_t>(usedVer_) << 16) + (static_cast<uint32_t>(cost_) << 8) + depth_;
     }
 
-    void HashData::Rewrite(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
+    inline void HashData::Rewrite(score_t upper, score_t lower, score_t score, Position move, uint8_t version, uint8_t cost, uint8_t depth)
     {
         this->upper_ = score < upper ? score : kEvalMax;
         this->lower_ = score > lower ? score : kEvalMin;
@@ -114,7 +114,7 @@ namespace solver
         this->depth_   = depth;
     }
 
-    void HashData::Update(score_t upper, score_t lower, score_t score, Position move)
+    inline void HashData::Update(score_t upper, score_t lower, score_t score, Position move)
     {
         if (score < upper && score < this->upper_)
             this->upper_ = score;
@@ -127,7 +127,7 @@ namespace solver
         }
     }
 
-    void HashData::Deepen(score_t upper, score_t lower, score_t score, Position move, uint8_t depth)
+    inline void HashData::Deepen(score_t upper, score_t lower, score_t score, Position move, uint8_t depth)
     {
         this->upper_ = score < upper ? score : kEvalMax;
         this->lower_ = score > lower ? score : kEvalMin;

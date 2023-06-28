@@ -361,7 +361,7 @@ namespace solver
 
         if (USE_HASH && depth >= option_.midHashDepth)
         {
-            table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
+            table_->Add(stones_, hashCode, upLimit, lowLimit, bestScore, bestMove, 0, depth);
         }
 
         return bestScore;
@@ -457,7 +457,9 @@ namespace solver
 
         if (USE_HASH && depth >= option_.midHashDepth)
         {
-            table_->Add(stones_, hashCode, kEvalMax, lower, bestScore, bestMove, 0, depth);
+            // fail-softなのでbeta cut(score >= upLimit)された場合でも
+            // score < upperとなりhash.upperは更新されない（hash.lowerのみ更新）
+            table_->Add(stones_, hashCode, upLimit, upLimit - 1, bestScore, bestMove, 0, depth);
         }
 
         return bestScore;

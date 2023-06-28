@@ -49,14 +49,15 @@ namespace train
             if (i >= record.nRandMoves_)
             {
                 const int nbEmpty      = 60 - i - 1 /*上でPutした分-1*/;
-                const int phase        = Phase(nbEmpty);
                 const Color side       = board.GetSide();
                 const int resultForOwn = result * (side == Color::Black ? 1 : -1);
+
+                assert(nbEmpty == CountBits(board.GetOwn() | board.GetOpp()));
 
                 // 自分視点
                 AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
                 // 相手視点
-                AddNewAllSymmetry(board.GetOwn(), board.GetOpp(), resultForOwn, nbEmpty);
+                AddNewAllSymmetry(board.GetOpp(), board.GetOwn(), -resultForOwn, nbEmpty);
             }
 
             ++pos;
@@ -84,7 +85,7 @@ namespace train
 
     void ReplayBuffer::AddNewRecord(stone_t own, stone_t opp, int diff, int nbEmpty)
     {
-        Stone&& stone = {own, opp};
+        Stone&& stone      = {own, opp};
         TrainRecord record = {stone, diff};
 
         const int first = Phase(nbEmpty - kSmoothRange);

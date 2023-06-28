@@ -11,6 +11,7 @@ namespace eval
         // キャッシュに乗るようにまとめて確保する
         // (本体は [weight_[0][0] = ...] の行)
         weight_ = AllocPatternWeight<int16_t>();
+        Load("resource/weights/weight_25.dat");
     }
 
     PatternEval::PatternEval(const std::string& path) : PatternEval()

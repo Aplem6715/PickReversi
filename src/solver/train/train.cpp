@@ -88,8 +88,11 @@ namespace train
             logfile << std::endl;
             book.Clear();
 
-            auto saveFile = std::format("resources/weights/weight_{}.dat", i);
-            eval_.Save(saveFile);
+            auto saveFile = std::format("resource/weights/weight_{}.dat", i);
+            if (!eval_.Save(saveFile))
+            {
+                std::cerr << "Save Weight failed";
+            }
             ++i;
         }
 

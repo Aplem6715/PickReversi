@@ -9,8 +9,8 @@ namespace train
     // スムージング・データのかさ増し（隣の開きマス数が同じフェーズ所属なら無視）
     constexpr int kSmoothRange = 2;
 
-    constexpr int kBatchSize = 2048;
-    constexpr int kIteration = 10;
+    constexpr int kBatchSize = 4096;
+    constexpr int kIteration = 50;
     // データロード後，バッファがこのサイズ以上溜まっていたら学習・消化
     constexpr int kReplayBufferSize = kBatchSize * kIteration;
     // 同じデータを何回使い回すか

@@ -205,7 +205,7 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {
@@ -226,7 +226,7 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {
@@ -247,7 +247,7 @@ namespace eval
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {
@@ -262,13 +262,13 @@ namespace eval
 
         for (int i = 0; i < nbPattern; ++i)
         {
-            // 2(own) -> 0(opp)
+            // 2(opp) -> 0(empty)
             state_[pos2pat.pattern[i].uid] -= 2 * pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {
@@ -283,13 +283,13 @@ namespace eval
 
         for (int i = 0; i < nbPattern; ++i)
         {
-            // 1(own) -> 0(empty)
-            state_[pos2pat.pattern[i].uid] -= pos2pat.pattern[i].idx;
+            // 1(own) -> 2(opp)
+            state_[pos2pat.pattern[i].uid] += pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {
@@ -304,13 +304,13 @@ namespace eval
 
         for (int i = 0; i < nbPattern; ++i)
         {
-            // 2(opp) -> 0(empty)
-            state_[pos2pat.pattern[i].uid] -= 2 * pos2pat.pattern[i].idx;
+            // 2(opp) -> 1(own)
+            state_[pos2pat.pattern[i].uid] -= pos2pat.pattern[i].idx;
 
             // range check (0 ~ MaxIndex)
             assert(state_[pos2pat.pattern[i].uid] - kPatternOffset[pos2pat.pattern[i].uid] < kShapeIndexMax[kPattern2Shape[pos2pat.pattern[i].uid]]);
         }
-        
+
         // TODO: 検証: こっちのほうがループ展開されやすそう
         // for (int i = 0; i < kPosPatternMax; ++i)
         // {

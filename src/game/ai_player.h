@@ -3,11 +3,6 @@
 
 #include "player.h"
 
-namespace eval
-{
-    class PositionEval;
-}
-
 namespace solver
 {
     template <class Evaluator>
@@ -17,6 +12,7 @@ namespace solver
 namespace game
 {
 
+    template<class Evaluator>
     class AIPlayer : public Player
     {
     public:
@@ -27,7 +23,7 @@ namespace game
         virtual void NotifyUndo() override {} /*なにもしない*/
 
     private:
-        solver::Searcher<eval::PositionEval>* searcher_;
+        solver::Searcher<Evaluator>* searcher_;
     };
 }
 

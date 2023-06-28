@@ -1,11 +1,13 @@
 #include "movelist.h"
 #include "eval/pos_eval.h"
+#include "eval/pattern_eval.h"
 #include "hash.h"
 #include "search.h"
 
 namespace solver
 {
     template void Move::Evaluate<eval::PositionEval>(Searcher<eval::PositionEval>& searcher, const HashData& hashData);
+    template void Move::Evaluate<eval::PatternEval>(Searcher<eval::PatternEval>& searcher, const HashData& hashData);
 
     Move* solver::MoveList::GetNextBest()
     {

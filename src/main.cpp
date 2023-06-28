@@ -8,7 +8,7 @@
 
 int main()
 {
-    auto game = new game::Game(game::PlayerType::Console, game::PlayerType::AI);
+    auto game = new game::Game(game::PlayerType::Console, game::PlayerType::AI_Pattern);
     game->Play();
     game::MatchBook book;
     book.AddRecord(game->GetRecord());

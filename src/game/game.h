@@ -3,7 +3,6 @@
 
 #include "board/board.h"
 #include "record.h"
-// #include <spdlog/spdlog.h>
 #include <memory>
 
 namespace game
@@ -16,7 +15,8 @@ namespace game
     enum class PlayerType
     {
         Console,
-        AI,
+        AI_Position,
+        AI_Pattern,
     };
 
     class Game

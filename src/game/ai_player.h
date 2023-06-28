@@ -5,12 +5,14 @@
 
 namespace solver
 {
+    template <class Evaluator>
     class Searcher;
 }
 
 namespace game
 {
 
+    template<class Evaluator>
     class AIPlayer : public Player
     {
     public:
@@ -21,7 +23,7 @@ namespace game
         virtual void NotifyUndo() override {} /*なにもしない*/
 
     private:
-        solver::Searcher* searcher_;
+        solver::Searcher<Evaluator>* searcher_;
     };
 }
 

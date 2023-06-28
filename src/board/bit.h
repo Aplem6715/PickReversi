@@ -287,6 +287,56 @@ inline Position NextIndex(uint64_t* bits)
     return BitToPos(*bits);
 }
 
+inline uint64_t DeltaSwap(uint64_t x, uint64_t mask, uint64_t delta)
+{
+    uint64_t tmp = (x ^ (x >> delta)) & mask;
+    return x ^ tmp ^ (tmp << delta);
+}
+
+inline uint64_t ReverseH(uint64_t bits)
+{
+    bits = DeltaSwap(bits, 0x5555555555555555, 1);
+    bits = DeltaSwap(bits, 0x3333333333333333, 2);
+    return DeltaSwap(bits, 0x0F0F0F0F0F0F0F0F, 4);
+}
+
+inline uint64_t ReverseV(uint64_t bits)
+{
+    bits = DeltaSwap(bits, 0x00FF00FF00FF00FF, 8);
+    bits = DeltaSwap(bits, 0x0000FFFF0000FFFF, 16);
+    return DeltaSwap(bits, 0x00000000FFFFFFFF, 32);
+}
+
+inline uint64_t ReverseDiagUp(uint64_t bits)
+{
+    bits = DeltaSwap(bits, 0x00AA00AA00AA00AA, 7);
+    bits = DeltaSwap(bits, 0x0000CCCC0000CCCC, 14);
+    return DeltaSwap(bits, 0x00000000F0F0F0F0, 28);
+}
+
+inline uint64_t ReverseDiagDown(uint64_t bits)
+{
+    bits = DeltaSwap(bits, 0x0055005500550055, 9);
+    bits = DeltaSwap(bits, 0x0000333300003333, 18);
+    return DeltaSwap(bits, 0x000000000F0F0F0F, 36);
+}
+
+inline uint64_t RotateR(uint64_t bits)
+{
+    return ReverseH(ReverseDiagDown(bits));
+}
+
+inline uint64_t RotateL(uint64_t bits)
+{
+    return ReverseV(ReverseDiagUp(bits));
+}
+
+inline uint64_t Rotate180(uint64_t bits)
+{
+    return ReverseH(ReverseV(bits));
+}
+
+// TODO: 「pos」を「Position pos」にしてforブロック内に限定
 #define for_bits(pos, bits) for (pos = BitToPos(bits); bits; pos = NextIndex(&bits))
 
 #pragma warning(pop)

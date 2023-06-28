@@ -2,10 +2,9 @@
 #define SEARCH_H
 
 #include <vector>
+#include <cassert>
 
 #include "board/stone.h"
-#include "eval/evaluator.h"
-#include "eval/pos_eval.h"
 #include "hash_table.h"
 #include "movelist.h"
 #include "search_option.h"
@@ -14,13 +13,49 @@
 #include "bench/bench_result.h"
 #endif
 
+// TODO: UpとLowの引数指定順番を逆に
+
 namespace solver
 {
-    using namespace board;
-    using namespace eval;
-
     struct SearchResult;
 
+    /// @brief ハッシュデータを元に探索範囲を狭める（またはカット）
+    /// @param hashData ハッシュデータ
+    /// @param depth 探索深度
+    /// @param lower 下限値
+    /// @param upper 上限値
+    /// @param score スコア
+    /// @return カットされるならtrue
+    inline bool ApplyHashRange(const HashData& hashData, const int depth, score_t* lower, score_t* upper, score_t* score)
+    {
+        assert(hashData.lower_ <= hashData.upper_);
+
+        if (hashData.depth_ == depth)
+        {
+            if (hashData.lower_ == hashData.upper_)
+            {
+                *score = hashData.upper_;
+                return true;
+            }
+            if (hashData.upper_ <= *lower)
+            {
+                *score = hashData.upper_;
+                return true;
+            }
+            if (hashData.lower_ >= *upper)
+            {
+                *score = hashData.lower_;
+                return true;
+            }
+
+            *lower = std::max(*lower, static_cast<score_t>(hashData.lower_));
+            *upper = std::min(*upper, static_cast<score_t>(hashData.upper_));
+        }
+
+        return false;
+    }
+
+    template <class Evaluator>
     class Searcher
     {
     public:
@@ -36,14 +71,14 @@ namespace solver
         void Search(stone_t own, stone_t opp, SearchResult* result);
 
         const int GetNumEmpty() const { return nbEmpty_; }
-        const Stone& GetStone() const { return stones_; }
+        const board::Stone& GetStone() const { return stones_; }
         Evaluator& GetEval() { return eval_; }
 
     private:
         // 盤面
-        Stone stones_;
+        board::Stone stones_;
         // 評価関数
-        PositionEvaluator eval_;
+        Evaluator eval_;
         // 置換表
         HashTable* table_;
         // 探索設定
@@ -75,42 +110,65 @@ namespace solver
         void MidRoot(SearchResult* result);
 
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score32_t MidMinMax(int depth, bool passed);
+        score_t MidMinMax(int depth, bool passed);
 
-        /// @brief 中盤αβ探索
-        score32_t MidAlphaBeta(const score32_t up_limit, const score32_t low_limit, const int depth, const bool passed);
+/// @brief 中盤αβ探索
+#if ENABLE_DEPTH_TEMPLATE
+        template <int depth>
+        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const bool passed);
+#else
+        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+#endif
+
+/// @brief 中盤PVS探索
+#if ENABLE_DEPTH_TEMPLATE
+        template <int depth>
+        score_t MidPVS(const score_t up_limit, const score_t low_limit, const bool passed);
+#else
+        score_t MidPVS(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+#endif
+
+/// @brief 中盤PVS探索
+#if ENABLE_DEPTH_TEMPLATE
+        template <int depth>
+        score_t MidNWS(const score_t up_limit, const bool passed);
+#else
+        score_t MidNWS(const score_t up_limit, const int depth, const bool passed);
+#endif
 
         /* 終盤探索(search_end.cpp) */
         /// @brief 終盤探索ルート
         void EndRoot(SearchResult* result);
 
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
-        score32_t EndMinMax(int depth, bool passed);
+        score_t EndMinMax(int depth, bool passed);
 
         /// @brief 終盤αβ探索
-        score32_t EndAlphaBeta(const score32_t upper, const score32_t lower, const int depth, const bool passed);
+        score_t EndAlphaBeta(const score_t upper, const score_t lower, const int depth, const bool passed);
 
         /* 探索中に使用するinline関数 */
 
         void Update(const Move* move, bool updateEval)
         {
             --nbEmpty_;
-            const uint64_t posBit = PosToBit(move->pos_);
-            stones_.Update(posBit, move->flips_);
+            const auto& pos  = move->pos_;
+            const auto& flip = move->flips_;
+            stones_.Update(pos, flip);
             if (updateEval)
             {
-                eval_.Update(posBit, move->flips_);
+                eval_.Update(pos, flip);
             }
         }
 
         void Restore(const Move* move, bool updateEval)
         {
             ++nbEmpty_;
-            const uint64_t posBit = PosToBit(move->pos_);
-            stones_.Restore(posBit, move->flips_);
+            const auto& pos  = move->pos_;
+            const auto& flip = move->flips_;
+            stones_.Restore(pos, flip);
             if (updateEval)
             {
-                eval_.Restore(posBit, move->flips_);
+                eval_.Restore(pos, flip);
             }
         }
 
@@ -120,7 +178,7 @@ namespace solver
             eval_.UpdatePass();
         }
 
-        score32_t WinJudge()
+        score_t WinJudge()
         {
             auto diff = stones_.GetCountDiff();
             if (diff > 0)
@@ -137,7 +195,7 @@ namespace solver
             }
         }
 
-        score32_t WinJudgeEnd()
+        score_t WinJudgeEnd()
         {
             auto diff = stones_.GetCountDiff();
             // 空きマスは勝った方に加算される
@@ -155,5 +213,6 @@ namespace solver
             }
         }
     };
-}
+
+} // namespace solver
 #endif

@@ -16,7 +16,7 @@ file(GLOB_RECURSE SOURCE RELATIVE "${CMAKE_SOURCE_DIR}/test" "${CMAKE_SOURCE_DIR
 file(GLOB_RECURSE TEST_SOURCE RELATIVE "${CMAKE_SOURCE_DIR}/test" "*.cpp" "*.h")
 list(REMOVE_ITEM SOURCE "../src/main.cpp")
 list(REMOVE_ITEM SOURCE "../src/bench/benchmark.cpp")
-list(REMOVE_ITEM SOURCE "../src/Solver/train/selfplay.cpp")
+list(REMOVE_ITEM SOURCE "../src/solver/train/train.cpp")
 
 function(print_list TITLE LIST)
     message(STATUS "##### ${TITLE} #####")
@@ -33,6 +33,7 @@ target_link_libraries(UnitTest gtest gtest_main pthread)
 
 enable_testing()
 add_compile_definitions(UNIT_TEST)
+add_compile_definitions(TRAIN_BUILD)
 
 include(GoogleTest)
 gtest_add_tests(TARGET UnitTest)

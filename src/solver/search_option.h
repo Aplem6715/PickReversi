@@ -29,7 +29,7 @@ namespace solver
     };
 
     constexpr SearchOption kDefaultOption = {
-        .midDepth_ = 10,
+        .midDepth_ = 8,
         .endDepth_ = 18,
         .hashSize_ = 1 << 24, // ~= 16[MB]
         .method_   = SearchMethod::AlphaBeta,
@@ -51,7 +51,7 @@ namespace solver
         .midOrderingDepth = 4,
         .endOrderingDepth = 6,
     };
-    
+
 } // namespace solver
 
 #endif

@@ -59,9 +59,15 @@ namespace game
             std::stringstream ss(line);
 
             std::string str;
+            bool isFirst = true;
             while (std::getline(ss, str, ' '))
             {
+                if (isFirst && std::isdigit(str[0]))
+                {
+                    continue;
+                }
                 splitted.push_back(str);
+                isFirst = false;
             }
 
             record.nRandMoves_ = PositionHelper::PositionsFromAscii(splitted[0], record.moves_);
@@ -99,7 +105,7 @@ namespace game
                 ss << PositionHelper::ToString(record.moves_[i]);
             }
 
-            if(record.nMoves_ == record.nRandMoves_)
+            if (record.nMoves_ == record.nRandMoves_)
             {
                 ss << ' ';
             }

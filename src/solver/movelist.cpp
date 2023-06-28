@@ -1,9 +1,14 @@
 #include "movelist.h"
+#include "eval/pos_eval.h"
+#include "eval/pattern_eval.h"
 #include "hash.h"
 #include "search.h"
 
 namespace solver
 {
+    template void Move::Evaluate<eval::PositionEval>(Searcher<eval::PositionEval>& searcher, const HashData& hashData);
+    template void Move::Evaluate<eval::PatternEval>(Searcher<eval::PatternEval>& searcher, const HashData& hashData);
+
     Move* solver::MoveList::GetNextBest()
     {
         if (!lastMove_->next_)
@@ -42,15 +47,8 @@ namespace solver
         return lastMove_;
     }
 
-    void MoveList::Evaluate(Searcher& searcher, const HashData& hashData)
-    {
-        for (auto move = moves_->next_; move; move = move->next_)
-        {
-            move->Evaluate(searcher, hashData);
-        }
-    }
-
-    void Move::Evaluate(Searcher& searcher, const HashData& hashData)
+    template <class Evaluator>
+    void Move::Evaluate(Searcher<Evaluator>& searcher, const HashData& hashData)
     {
         constexpr int kWipeoutOrder      = 30;
         constexpr int kBestMoveOrder     = 29;
@@ -82,7 +80,7 @@ namespace solver
         }
         else
         {
-            eval::Evaluator& eval = searcher.GetEval();
+            auto& eval = searcher.GetEval();
 
             Position pos    = pos_;
             uint64_t posBit = PosToBit(pos);
@@ -102,13 +100,13 @@ namespace solver
 
             // 一手読みのスコア付け（16~8bit目)
             // 着手して相手のターンに進める
-            eval.Update(posBit, flips);
-            const score32_t score = eval.Evaluate(searcher.GetNumEmpty() - 1);
-            eval.Restore(posBit, flips);
+            eval.Update(pos, flips);
+            const score_t score = eval.Evaluate(Phase(searcher.GetNumEmpty() - 1));
+            eval.Restore(pos, flips);
             value -= score * (1 << kOneStepScoreOrder);
 
             // 着手位置でスコア付け(8~0bit)
-            value = ValueTable[static_cast<int>(pos)] * (1 << kPosScoreOrder);
+            value = eval::ValueTable[static_cast<int>(pos)] * (1 << kPosScoreOrder);
 
             value_ = value;
         }

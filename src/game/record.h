@@ -21,6 +21,7 @@ namespace game
         std::vector<MatchRecord>& GetRecordEditable() { return records_; }
 
         void AddRecord(const MatchRecord& record);
+        void Clear() { records_.clear(); }
 
         void Read(std::string path);
         void Write(std::string path);

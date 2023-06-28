@@ -1,6 +1,6 @@
 #include "movelist.h"
-#include "eval/pos_eval.h"
 #include "eval/pattern_eval.h"
+#include "eval/pos_eval.h"
 #include "hash.h"
 #include "search.h"
 
@@ -80,33 +80,40 @@ namespace solver
         }
         else
         {
-            auto& eval = searcher.GetEval();
-
-            Position pos    = pos_;
-            uint64_t posBit = PosToBit(pos);
-            uint64_t flips  = flips_;
+            const Position pos    = pos_;
+            const uint64_t posBit = PosToBit(pos);
+            const uint64_t flips  = flips_;
 
             board::Stone nextStone = stone;
             nextStone.Update(posBit, flips);
 
+            int value;
+
             // 着手可能数での評価=速度優先探索（24~16bit）
-            const uint64_t nextMob = nextStone.CalcMobility();
-            // 正の値にするためのバイアス
-            int mobCount = kMaxMove + 4 /*角ボーナス分*/;
-            mobCount += CountBits(nextMob);
-            mobCount += CountBits(nextMob & 0x8100000000000081);
-            // 相手の手が多い＝マイナス
-            int value = mobCount * (1 << kMobilityOrder);
+            {
+                const uint64_t nextMob = nextStone.CalcMobility();
+                // 正の値にするためのバイアス
+                int mobCount = kMaxMove + 4 /*角ボーナス分*/;
+                mobCount -= CountBits(nextMob);
+                mobCount -= CountBits(nextMob & 0x8100000000000081); // 角ボーナス
+                // 相手の手が多い＝マイナス
+                value = mobCount * (1 << kMobilityOrder);
+            }
 
             // 一手読みのスコア付け（16~8bit目)
-            // 着手して相手のターンに進める
-            eval.Update(pos, flips);
-            const score_t score = eval.Evaluate(Phase(searcher.GetNumEmpty() - 1));
-            eval.Restore(pos, flips);
-            value -= score * (1 << kOneStepScoreOrder);
+            {
+                auto& eval = searcher.GetEval();
+                // 着手して相手のターンに進める
+                eval.Update(pos, flips);
+                const score_t score = eval.Evaluate(Phase(searcher.GetNumEmpty() - 1));
+                eval.Restore(pos, flips);
+                value -= score * (1 << kOneStepScoreOrder);
+            }
 
             // 着手位置でスコア付け(8~0bit)
-            value = eval::ValueTable[static_cast<int>(pos)] * (1 << kPosScoreOrder);
+            {
+                value += eval::ValueTable[static_cast<int>(pos)] * (1 << kPosScoreOrder);
+            }
 
             value_ = value;
         }

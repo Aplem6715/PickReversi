@@ -1,8 +1,8 @@
 ﻿#ifndef SEARCH_H
 #define SEARCH_H
 
-#include <vector>
 #include <cassert>
+#include <vector>
 
 #include "board/stone.h"
 #include "hash_table.h"
@@ -50,6 +50,33 @@ namespace solver
 
             *lower = std::max(*lower, static_cast<score_t>(hashData.lower_));
             *upper = std::min(*upper, static_cast<score_t>(hashData.upper_));
+        }
+
+        return false;
+    }
+
+    /// @brief ハッシュデータを元にカット
+    /// @param hashData ハッシュデータ
+    /// @param depth 探索深度
+    /// @param lower 下限値
+    /// @param score スコア
+    /// @return カットされるならtrue
+    inline bool ApplyHashRangeNWS(const HashData& hashData, const int depth, const score_t lower, score_t* score)
+    {
+        assert(hashData.lower_ <= hashData.upper_);
+
+        if (hashData.depth_ == depth)
+        {
+            if (hashData.upper_ <= lower)
+            {
+                *score = hashData.upper_;
+                return true;
+            }
+            if (hashData.lower_ > lower)
+            {
+                *score = hashData.lower_;
+                return true;
+            }
         }
 
         return false;
@@ -112,27 +139,17 @@ namespace solver
         /// @brief 中盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
         score_t MidMinMax(int depth, bool passed);
 
-/// @brief 中盤αβ探索
+/// @brief 中盤探索
 #if ENABLE_DEPTH_TEMPLATE
         template <int depth>
         score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const bool passed);
-#else
-        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
-#endif
-
-/// @brief 中盤PVS探索
-#if ENABLE_DEPTH_TEMPLATE
         template <int depth>
         score_t MidPVS(const score_t up_limit, const score_t low_limit, const bool passed);
-#else
-        score_t MidPVS(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
-#endif
-
-/// @brief 中盤PVS探索
-#if ENABLE_DEPTH_TEMPLATE
         template <int depth>
         score_t MidNWS(const score_t up_limit, const bool passed);
 #else
+        score_t MidAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+        score_t MidPVS(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
         score_t MidNWS(const score_t up_limit, const int depth, const bool passed);
 #endif
 
@@ -143,33 +160,38 @@ namespace solver
         /// @brief 終盤探索MinMax法（主にテストベース用，カットなしの正しい探索と探索速度のベースを提供）
         score_t EndMinMax(int depth, bool passed);
 
-        /// @brief 終盤αβ探索
-        score_t EndAlphaBeta(const score_t upper, const score_t lower, const int depth, const bool passed);
+/// @brief 中盤探索
+#if ENABLE_DEPTH_TEMPLATE
+        template <int depth>
+        score_t EndAlphaBeta(const score_t up_limit, const score_t low_limit, const bool passed);
+        template <int depth>
+        score_t EndPVS(const score_t up_limit, const score_t low_limit, const bool passed);
+        template <int depth>
+        score_t EndNWS(const score_t up_limit, const bool passed);
+#else
+        score_t EndAlphaBeta(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+        score_t EndPVS(const score_t up_limit, const score_t low_limit, const int depth, const bool passed);
+        score_t EndNWS(const score_t up_limit, const int depth, const bool passed);
+#endif
 
         /* 探索中に使用するinline関数 */
 
-        void Update(const Move* move, bool updateEval)
+        void Update(const Move* move)
         {
             --nbEmpty_;
             const auto& pos  = move->pos_;
             const auto& flip = move->flips_;
             stones_.Update(pos, flip);
-            if (updateEval)
-            {
-                eval_.Update(pos, flip);
-            }
+            eval_.Update(pos, flip);
         }
 
-        void Restore(const Move* move, bool updateEval)
+        void Restore(const Move* move)
         {
             ++nbEmpty_;
             const auto& pos  = move->pos_;
             const auto& flip = move->flips_;
             stones_.Restore(pos, flip);
-            if (updateEval)
-            {
-                eval_.Restore(pos, flip);
-            }
+            eval_.Restore(pos, flip);
         }
 
         void UpdatePass()

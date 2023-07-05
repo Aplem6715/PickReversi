@@ -8,6 +8,12 @@
 
 namespace solver
 {
+
+    constexpr int kMidHashDepth = 2;
+    constexpr int kEndHashDepth = 6;
+    constexpr int kMidOrderingDepth = 4;
+    constexpr int kEndOrderingDepth = 6;
+
     enum class SearchMethod : uint8_t
     {
         MinMax,
@@ -22,22 +28,19 @@ namespace solver
         uint64_t hashSize_;
         SearchMethod method_;
 
-        int midHashDepth;
-        int endHashDepth;
-        int midOrderingDepth;
-        int endOrderingDepth;
+        // int midHashDepth;
+        // int endHashDepth;
+        // int midOrderingDepth;
+        // int endOrderingDepth;
     };
+
+
 
     constexpr SearchOption kDefaultOption = {
         .midDepth_ = 8,
         .endDepth_ = 18,
         .hashSize_ = 1 << 24, // ~= 16[MB]
         .method_   = SearchMethod::AlphaBeta,
-
-        .midHashDepth     = 2,
-        .endHashDepth     = 6,
-        .midOrderingDepth = 4,
-        .endOrderingDepth = 6,
     };
 
     constexpr SearchOption kAccuracyTestOption = {
@@ -45,11 +48,6 @@ namespace solver
         .endDepth_ = 12,
         .hashSize_ = 1 << 24, // ~= 16[MB]
         .method_   = SearchMethod::AlphaBeta,
-
-        .midHashDepth     = 2,
-        .endHashDepth     = 6,
-        .midOrderingDepth = 4,
-        .endOrderingDepth = 6,
     };
 
 } // namespace solver

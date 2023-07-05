@@ -46,7 +46,7 @@ namespace solver
         // RootではHashカットせずMoveOrderingのみで使用
         HashData hashData;
         const uint64_t hashCode = USE_HASH ? GetHashCode(stones_) : 0;
-        if (USE_HASH && depth >= option_.midHashDepth)
+        if (USE_HASH && depth >= kMidHashDepth)
         {
             table_->TryGetValue(stones_, hashCode, &hashData);
         }
@@ -65,7 +65,7 @@ namespace solver
 
         while (Move* move = moveList->GetNextBest())
         {
-            Update(move, true);
+            Update(move);
             {
                 switch (option_.method_)
                 {
@@ -80,7 +80,7 @@ namespace solver
                     break;
                 }
             }
-            Restore(move, true);
+            Restore(move);
 
             move->value_ = score;
 
@@ -96,7 +96,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= option_.midHashDepth)
+        if (USE_HASH && depth >= kMidHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
@@ -134,9 +134,9 @@ namespace solver
         {
             while (const Move* move = moveList->GetNextBest())
             {
-                Update(move, true);
+                Update(move);
                 const score_t score = -MidMinMax(depth - 1, false);
-                Restore(move, true);
+                Restore(move);
 
                 if (score > bestScore)
                 {
@@ -170,7 +170,7 @@ namespace solver
 
         /* Hash Cut */
         HashData hashData;
-        const bool useHash      = USE_HASH && depth >= option_.midHashDepth;
+        const bool useHash      = USE_HASH && depth >= kMidHashDepth;
         const uint64_t hashCode = useHash ? GetHashCode(stones_) : 0;
         if (useHash)
         {
@@ -209,15 +209,15 @@ namespace solver
         }
         else
         {
-            if (USE_ORDER && depth >= option_.midOrderingDepth)
+            if (USE_ORDER && depth >= kMidOrderingDepth)
             {
                 moveList->Evaluate(*this, hashData);
             }
             while (const Move* move = moveList->GetNextBest())
             {
-                Update(move, true);
+                Update(move);
                 const score_t score = -MidAlphaBetaSwitch(-lower, -upper, depth - 1, false);
-                Restore(move, true);
+                Restore(move);
 
                 if (score > bestScore)
                 {
@@ -236,7 +236,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= option_.midHashDepth)
+        if (USE_HASH && depth >= kMidHashDepth)
         {
             table_->Add(stones_, hashCode, upper, lower, bestScore, bestMove, 0, depth);
         }
@@ -266,7 +266,7 @@ namespace solver
 
         /* Hash Cut */
         HashData hashData;
-        const bool useHash      = USE_HASH && depth >= option_.midHashDepth;
+        const bool useHash      = USE_HASH && depth >= kMidHashDepth;
         const uint64_t hashCode = useHash ? GetHashCode(stones_) : 0;
         if (useHash)
         {
@@ -305,7 +305,7 @@ namespace solver
         }
         else
         {
-            if (USE_ORDER && depth >= option_.midOrderingDepth)
+            if (USE_ORDER && depth >= kMidOrderingDepth)
             {
                 moveList->Evaluate(*this, hashData);
             }
@@ -313,9 +313,9 @@ namespace solver
             // first move
             {
                 const Move* firstMove = moveList->GetNextBest();
-                Update(firstMove, true);
+                Update(firstMove);
                 bestScore = -MidPVSSwitch(-lower, -upper, depth - 1, false);
-                Restore(firstMove, true);
+                Restore(firstMove);
 
                 if (bestScore > lower)
                 {
@@ -330,7 +330,7 @@ namespace solver
             // others
             while (const Move* move = moveList->GetNextBest())
             {
-                Update(move, true);
+                Update(move);
                 score_t score = -MidNWSSwitch(-lower, depth - 1, false);
                 if (score > lower && score < upper)
                 {
@@ -340,7 +340,7 @@ namespace solver
                         lower = score;
                     }
                 }
-                Restore(move, true);
+                Restore(move);
 
                 if (score > bestScore)
                 {
@@ -350,7 +350,7 @@ namespace solver
                     {
                         break;
                     }
-                    // NWSではここを通らないので再探索時のみlowerを更新するように上に移動
+                    // NWSに成功したらここを通らない(score >= upper = lower + 1になる)のでNWS失敗時のみこの処理をするように上の別ブロックに移動
                     // else if (score > lower)
                     // {
                     //     lower = bestScore;
@@ -359,7 +359,7 @@ namespace solver
             }
         }
 
-        if (USE_HASH && depth >= option_.midHashDepth)
+        if (USE_HASH && depth >= kMidHashDepth)
         {
             table_->Add(stones_, hashCode, upLimit, lowLimit, bestScore, bestMove, 0, depth);
         }
@@ -376,6 +376,8 @@ namespace solver
     score_t Searcher<Evaluator>::MidNWS(const score_t upLimit, const int depth, const bool passed)
 #endif
     {
+        // 非テンプレート利用の際のために残しておく。
+        // テンプレート利用時は最適化により消える（はず）
         if (depth == 0)
         {
             PROFILE(++prof_.leafCount);
@@ -384,19 +386,19 @@ namespace solver
 
         PROFILE(++prof_.nodeCount);
 
-        score_t lower = upLimit - 1;
-        score_t upper = upLimit;
+        const score_t lower = upLimit - 1;
+        const score_t upper = upLimit;
 
         /* Hash Cut */
         HashData hashData;
-        const bool useHash      = USE_HASH && depth >= option_.midHashDepth;
+        const bool useHash      = USE_HASH && depth >= kMidHashDepth;
         const uint64_t hashCode = useHash ? GetHashCode(stones_) : 0;
         if (useHash)
         {
             if (table_->TryGetValue(stones_, hashCode, &hashData))
             {
                 score_t score;
-                if (ApplyHashRange(hashData, depth, &lower, &upper, &score))
+                if (ApplyHashRangeNWS(hashData, depth, lower, &score))
                 {
                     return score;
                 }
@@ -428,40 +430,90 @@ namespace solver
         }
         else
         {
-            if (USE_ORDER && depth >= option_.midOrderingDepth)
+            if (USE_ORDER && depth >= kMidOrderingDepth)
             {
                 moveList->Evaluate(*this, hashData);
             }
             while (const Move* move = moveList->GetNextBest())
             {
-                Update(move, true);
-                const score_t score = -MidNWSSwitch(-lower, depth, false);
-                Restore(move, true);
+                Update(move);
+                const score_t score = -MidNWSSwitch(-lower, depth - 1, false);
+                Restore(move);
 
                 if (score > bestScore)
                 {
                     bestScore = score;
                     bestMove  = move->pos_;
 
-                    if (score >= upper)
+                    if (bestScore >= upper) // bestScore >= lower + 1
                     {
                         break;
                     }
-                    else if (bestScore > lower)
-                    {
-                        lower = bestScore;
-                    }
+                    // [lower = upper - 1]より，bestScore > lowerのときbestScore >= upperを満たすためここには到達しない
+                    // else if (bestScore > lower)
+                    // {
+                    //     lower = bestScore;
+                    // }
                 }
             }
         }
 
-        if (USE_HASH && depth >= option_.midHashDepth)
+        if (USE_HASH && depth >= kMidHashDepth)
         {
             // fail-softなのでbeta cut(score >= upLimit)された場合でも
-            // score < upperとなりhash.upperは更新されない（hash.lowerのみ更新）
+            // score>=upperとなりNullWindow用に狭められたupper(lower+1)は（hash.upper更新条件score<upperにより)更新されない
+            // lowLimitについてはPVノード下限真値にあたるため，記録されたものが別ノードに適用されても問題ない
             table_->Add(stones_, hashCode, upLimit, upLimit - 1, bestScore, bestMove, 0, depth);
         }
 
         return bestScore;
     }
+
+// template深度制限
+#if ENABLE_DEPTH_TEMPLATE
+    template <>
+    template <>
+    score_t Searcher<eval::PatternEval>::MidAlphaBeta<0>(const score_t upLimit, const score_t lowLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+    template <>
+    template <>
+    score_t Searcher<eval::PositionEval>::MidAlphaBeta<0>(const score_t upLimit, const score_t lowLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+
+    template <>
+    template <>
+    score_t Searcher<eval::PatternEval>::MidPVS<0>(const score_t upLimit, const score_t lowLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+    template <>
+    template <>
+    score_t Searcher<eval::PositionEval>::MidPVS<0>(const score_t upLimit, const score_t lowLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+
+    template <>
+    template <>
+    score_t Searcher<eval::PatternEval>::MidNWS<0>(const score_t upLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+    template <>
+    template <>
+    score_t Searcher<eval::PositionEval>::MidNWS<0>(const score_t upLimit, const bool passed)
+    {
+        PROFILE(++prof_.leafCount);
+        return eval_.Evaluate(Phase(nbEmpty_));
+    }
+#endif
 }
